@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: #000000;
+    color: #FFFFFF;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  body {
+    background-color: #000000;
+    color: #FFFFFF;
+    overflow-x: clip;
+  }
+
+  /* Custom Modern  Dark Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #000000;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #232328;
+    border-radius: 9999px;
+    transition: background 0.2s ease;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #E8602E;
+  }
+}
+
+@layer components {
+  /* Premium Dark Glass Panel with Subtle Border */
+  .sheryians-card {
+    @apply bg-[#121215]/80 backdrop-blur-xl border border-[#232328] hover:border-[#E8602E]/60 transition-all duration-300 rounded-2xl shadow-dark-card hover:shadow-glow-orange-sm;
+  }
+
+  .sheryians-panel {
+    @apply bg-[#0A0A0C]/90 backdrop-blur-2xl border border-[#232328] rounded-3xl shadow-glass;
+  }
+
+  /*  High-Energy Buttons */
+  .btn-primary-orange {
+    @apply relative inline-flex items-center justify-center font-semibold text-white px-6 py-3 rounded-full bg-[#E8602E] hover:bg-[#BC4C22] active:scale-[0.98] shadow-glow-orange-sm hover:shadow-glow-orange transition-all duration-200;
+  }
+
+  .btn-secondary-dark {
+    @apply relative inline-flex items-center justify-center font-semibold text-white px-6 py-3 rounded-full bg-[#16161A] hover:bg-[#202026] border border-[#2B2B33] hover:border-[#E8602E]/50 active:scale-[0.98] transition-all duration-200;
+  }
+
+  .btn-ghost-orange {
+    @apply relative inline-flex items-center justify-center font-medium text-[#E8602E] hover:text-white hover:bg-[#E8602E]/10 px-4 py-2 rounded-xl transition-all duration-200;
+  }
+
+  /* Input fields */
+  .sheryians-input {
+    @apply bg-[#0D0D10] border border-[#232328] text-white placeholder-[#71717A] rounded-xl px-4 py-3 focus:outline-none focus:border-[#E8602E] focus:ring-1 focus:ring-[#E8602E]/50 transition-all duration-200;
+  }
+
+  /* Gradient Text */
+  .gradient-text-orange {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#FFFFFF] via-[#FFE0D3] to-[#E8602E];
+  }
+
+  .gradient-text-fire {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#FF7A45] via-[#E8602E] to-[#BC4C22];
+  }
+
+  /* Orange Glow Borders */
+  .orange-glow-border {
+    position: relative;
+  }
+  .orange-glow-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    background: linear-gradient(135deg, #E8602E, #BC4C22, transparent, #E8602E);
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+  }
+  .orange-glow-border:hover::before {
+    opacity: 1;
+  }
+
+  /* Ambient Orange Spotlights */
+  .ambient-orange-spotlight {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(232, 96, 46, 0.15) 0%, rgba(188, 76, 34, 0.05) 50%, transparent 70%);
+    pointer-events: none;
+    border-radius: 50%;
+    filter: blur(80px);
+  }
+
+  /* Inverted Notch SVG Curves */
+  .notch-curve-left {
+    position: absolute;
+    top: 0;
+    left: -20px;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+  }
+
+  .notch-curve-right {
+    position: absolute;
+    top: 0;
+    right: -20px;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+  }
+}

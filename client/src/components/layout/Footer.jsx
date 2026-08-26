@@ -1,0 +1,162 @@
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faGraduationCap,
+  faArrowRight,
+  faPaperPlane,
+  faHeart,
+  faShieldHalved,
+} from '@fortawesome/free-solid-svg-icons';
+import {
+  faGithub,
+  faLinkedin,
+  faTwitter,
+  faDiscord,
+} from '@fortawesome/free-brands-svg-icons';
+import toast from 'react-hot-toast';
+
+export default function Footer() {
+  const [email, setEmail] = useState('');
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (!email) return;
+    toast.success('Subscribed! You will receive weekly career trend insights.');
+    setEmail('');
+  };
+
+  return (
+    <footer className="relative bg-[#000000] border-t border-[#1C1C22] text-[#D4D4D8] pt-16 pb-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Background Glow */}
+      <div className="ambient-orange-spotlight -bottom-40 left-1/2 -translate-x-1/2 opacity-20 pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-14 border-b border-[#1C1C22]">
+          {/* Col 1 & 2: Brand & Newsletter */}
+          <div className="lg:col-span-2 space-y-4">
+            <Link to="/" className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#FF7A45] via-[#E8602E] to-[#BC4C22] p-[1px] shadow-[0_2px_10px_rgba(232,96,46,0.5)] flex items-center justify-center">
+                <div className="w-full h-full bg-[#121215] rounded-[11px] flex items-center justify-center border-t border-white/30">
+                  <FontAwesomeIcon icon={faGraduationCap} className="text-[#E8602E] text-sm" />
+                </div>
+              </div>
+              <span className="text-xl font-extrabold font-display tracking-tight text-white">
+                Path<span className="text-[#E8602E]">Seeker</span>
+              </span>
+            </Link>
+
+            <p className="text-xs text-[#A1A1AA] leading-relaxed max-w-sm">
+              Empowering students, graduates, and working professionals to discover tailored career paths, AI-matched streams, and verified learning milestones.
+            </p>
+
+            {/* Newsletter Subscription */}
+            <form onSubmit={handleSubscribe} className="pt-2 max-w-sm">
+              <span className="text-xs font-bold text-white block mb-2">
+                Subscribe for Weekly Career Trends
+              </span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="email"
+                  placeholder="Enter your email..."
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="flex-1 bg-[#121215] border border-[#232328] text-white text-xs px-3.5 py-2.5 rounded-xl focus:border-[#E8602E] focus:outline-none transition-all placeholder-[#71717A]"
+                  required
+                />
+                <button
+                  type="submit"
+                  className="bg-[#E8602E] hover:bg-[#BC4C22] text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-glow-orange-sm"
+                >
+                  <span>Join</span>
+                  <FontAwesomeIcon icon={faPaperPlane} className="text-[10px]" />
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Col 3: Navigation */}
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-4">
+              Explore Platform
+            </h4>
+            <ul className="space-y-2.5 text-xs text-[#A1A1AA]">
+              <li>
+                <Link to="/careers" className="hover:text-[#E8602E] transition-colors">Career Bank</Link>
+              </li>
+              <li>
+                <Link to="/quiz" className="hover:text-[#E8602E] transition-colors">AI Interest Quiz</Link>
+              </li>
+              <li>
+                <Link to="/multimedia" className="hover:text-[#E8602E] transition-colors">Multimedia Center</Link>
+              </li>
+              <li>
+                <Link to="/stories" className="hover:text-[#E8602E] transition-colors">Success Stories</Link>
+              </li>
+              <li>
+                <Link to="/resources" className="hover:text-[#E8602E] transition-colors">Document Library</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 4: Career Passports */}
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-4">
+              Career Passports
+            </h4>
+            <ul className="space-y-2.5 text-xs text-[#A1A1AA]">
+              <li>
+                <Link to="/quiz?role=student" className="hover:text-[#E8602E] transition-colors">Student Passport</Link>
+              </li>
+              <li>
+                <Link to="/careers?stage=graduate" className="hover:text-[#E8602E] transition-colors">Graduate Passport</Link>
+              </li>
+              <li>
+                <Link to="/careers?stage=professional" className="hover:text-[#E8602E] transition-colors">Professional Pivot</Link>
+              </li>
+              <li>
+                <Link to="/login" className="hover:text-[#E8602E] transition-colors">Admin Portal</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 5: TechWiz & Legal */}
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-4">
+              Competition Info
+            </h4>
+            <div className="p-3.5 rounded-2xl bg-[#0D0D10] border border-[#232328] space-y-1.5 text-xs text-[#A1A1AA]">
+              <p className="text-white font-bold">TechWiz 6 Global</p>
+              <p className="text-[11px]">Category: Full-Stack Web Application</p>
+              <p className="text-[11px] text-[#E8602E]">Theme: Career Passport</p>
+            </div>
+
+            <div className="flex items-center gap-3 mt-4 text-[#A1A1AA]">
+              <a href="#" className="w-8 h-8 rounded-xl bg-[#121215] border border-[#232328] hover:border-[#E8602E] hover:text-[#E8602E] flex items-center justify-center transition-all">
+                <FontAwesomeIcon icon={faGithub} className="text-xs" />
+              </a>
+              <a href="#" className="w-8 h-8 rounded-xl bg-[#121215] border border-[#232328] hover:border-[#E8602E] hover:text-[#E8602E] flex items-center justify-center transition-all">
+                <FontAwesomeIcon icon={faLinkedin} className="text-xs" />
+              </a>
+              <a href="#" className="w-8 h-8 rounded-xl bg-[#121215] border border-[#232328] hover:border-[#E8602E] hover:text-[#E8602E] flex items-center justify-center transition-all">
+                <FontAwesomeIcon icon={faTwitter} className="text-xs" />
+              </a>
+              <a href="#" className="w-8 h-8 rounded-xl bg-[#121215] border border-[#232328] hover:border-[#E8602E] hover:text-[#E8602E] flex items-center justify-center transition-all">
+                <FontAwesomeIcon icon={faDiscord} className="text-xs" />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Copyright Row */}
+        <div className="flex flex-col sm:flex-row items-center justify-between pt-8 gap-4 text-xs text-[#71717A]">
+          <p>© 2026 PathSeeker (Aptech TechWiz 6). Built with React, Vite & Tailwind CSS.</p>
+          <p className="flex items-center gap-1">
+            <span>Crafted for Future Careers</span>
+            <FontAwesomeIcon icon={faHeart} className="text-[#E8602E] text-[10px]" />
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
