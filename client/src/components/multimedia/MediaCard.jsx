@@ -36,7 +36,7 @@ export default function MediaCard({ media, onPlayAudio }) {
   };
 
   return (
-    <div className="group relative rounded-3xl overflow-hidden glass-panel-ultra border border-white/10 hover:border-[#E8602E]/60 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between shadow-glass">
+    <div className="group relative rounded-3xl overflow-hidden glass-card-interactive flex flex-col justify-between shadow-glass">
       {/* 1. Top Media Thumbnail Header with Fitted Background */}
       <div className="relative h-52 w-full overflow-hidden bg-[#0A0A0F]">
         {/* Fitted Content Image */}

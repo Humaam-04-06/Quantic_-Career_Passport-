@@ -10,6 +10,9 @@ import MultimediaPage from './pages/MultimediaPage.jsx';
 import MediaDetailPage from './pages/MediaDetailPage.jsx';
 import StoriesPage from './pages/StoriesPage.jsx';
 import StorySubmitPage from './pages/StorySubmitPage.jsx';
+import ResourcesPage from './pages/ResourcesPage.jsx';
+import DashboardPage from './pages/DashboardPage.jsx';
+import AdminPage from './pages/AdminPage.jsx';
 
 export default function App() {
   return (
@@ -34,9 +37,12 @@ export default function App() {
           <Route path="/multimedia/:id" element={<MediaDetailPage />} />
           <Route path="/stories" element={<StoriesPage />} />
           <Route path="/stories/submit" element={<StorySubmitPage />} />
+          <Route path="/resources" element={<ResourcesPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="/login" element={<AuthPage mode="login" />} />
           <Route path="/register" element={<AuthPage mode="register" />} />
-          {/* Future Routes (Resources, Dashboard) */}
+          {/* Fallback */}
           <Route path="*" element={<LandingPage />} />
         </Routes>
       </div>

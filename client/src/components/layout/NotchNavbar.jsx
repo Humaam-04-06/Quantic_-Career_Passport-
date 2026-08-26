@@ -23,6 +23,7 @@ export default function NotchNavbar() {
     { name: 'Multimedia', path: '/multimedia' },
     { name: 'Success Stories', path: '/stories' },
     { name: 'Resource Library', path: '/resources' },
+    { name: 'Dashboard', path: '/dashboard' },
   ];
 
   const pillRef = useRef(null);

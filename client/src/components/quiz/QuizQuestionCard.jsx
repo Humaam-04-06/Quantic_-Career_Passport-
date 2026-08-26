@@ -12,7 +12,7 @@ export default function QuizQuestionCard({
   isLast,
 }) {
   return (
-    <div className="w-full max-w-2xl mx-auto p-8 sm:p-10 rounded-[2.5rem] glass-panel-ultra shadow-[0_20px_50px_rgba(0,0,0,0.9)] space-y-8 flex flex-col justify-between min-h-[460px]">
+    <div className="w-full max-w-2xl mx-auto p-8 sm:p-10 rounded-[2.5rem] glass-card-interactive shadow-[0_20px_50px_rgba(0,0,0,0.9)] space-y-8 flex flex-col justify-between min-h-[460px]">
       <div>
         {/* Top Dimension Category & Icon */}
         <div className="flex items-center justify-between mb-4">
