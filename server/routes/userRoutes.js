@@ -6,10 +6,17 @@ import {
   deleteBookmark,
   getNotifications,
   markNotificationRead,
+  getDashboard,
+  toggleTask,
+  addTask,
 } from '../controllers/userController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+
+router.get('/dashboard', protect, getDashboard);
+router.put('/tasks/:taskId', protect, toggleTask);
+router.post('/tasks', protect, addTask);
 
 router.get('/bookmarks', protect, getBookmarks);
 router.post('/bookmarks', protect, addBookmark);

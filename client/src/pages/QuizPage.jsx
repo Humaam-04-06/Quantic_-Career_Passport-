@@ -8,8 +8,10 @@ import QuizQuestionCard from '../components/quiz/QuizQuestionCard';
 import QuizResults from '../components/quiz/QuizResults';
 import { QUIZ_QUESTIONS } from '../data/quizQuestions';
 import { analyzeQuizWithGemini } from '../services/geminiService';
+import { quizApi } from '../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner, faBrain } from '@fortawesome/free-solid-svg-icons';
+import toast from 'react-hot-toast';
 
 export default function QuizPage() {
   const [searchParams] = useSearchParams();
@@ -21,15 +23,7 @@ export default function QuizPage() {
   );
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
-  const [answers, setAnswers] = useState({
-    technical: 7,
-    creative: 4,
-    analytical: 4,
-    social: 3,
-    enterprising: 3,
-    conventional: 3,
-    workStyle: 'startup',
-  });
+  const [answers, setAnswers] = useState({});
 
   const [analysisResult, setAnalysisResult] = useState(null);
 
@@ -47,6 +41,12 @@ export default function QuizPage() {
   };
 
   const handleNext = () => {
+    const currentAnswer = answers[currentQuestion.dimension];
+    if (currentAnswer === undefined || currentAnswer === null) {
+      toast.error('Please select an option to continue');
+      return;
+    }
+
     if (currentStepIndex < QUIZ_QUESTIONS.length - 1) {
       setCurrentStepIndex((prev) => prev + 1);
     } else {
@@ -67,6 +67,33 @@ export default function QuizPage() {
       const result = await analyzeQuizWithGemini(answers, selectedPersona);
       setAnalysisResult(result);
       setView('results');
+
+      // Persist results & sync candidate profile state
+      try {
+        localStorage.setItem('pathseeker_quiz_result', JSON.stringify(result));
+        const storedUser = JSON.parse(localStorage.getItem('pathseeker_user') || 'null');
+        if (storedUser) {
+          const updatedUser = {
+            ...storedUser,
+            hollandArchetype: result.hollandCode || 'IRA-94',
+            cognitiveScore: result.matchPercentage || 94,
+            targetRole: result.recommendedRoles?.[0]?.title || storedUser.targetRole,
+          };
+          localStorage.setItem('pathseeker_user', JSON.stringify(updatedUser));
+          window.dispatchEvent(new Event('authChange'));
+        }
+      } catch (err) {
+        console.error(err);
+      }
+
+      toast.success('Cognitive Holland Assessment Complete & Verified!');
+
+      // Sync with MongoDB backend
+      try {
+        await quizApi.evaluate(answers, selectedPersona);
+      } catch (err) {
+        console.warn('API sync warning:', err);
+      }
     } catch (error) {
       console.error('Quiz analysis error:', error);
       setView('results');
@@ -75,6 +102,7 @@ export default function QuizPage() {
 
   const handleRetake = () => {
     setCurrentStepIndex(0);
+    setAnswers({});
     setAnalysisResult(null);
     setView('intro');
   };

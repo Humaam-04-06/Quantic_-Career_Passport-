@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faGraduationCap,
@@ -7,16 +7,30 @@ import {
   faPrint,
   faShareNodes,
   faCheckCircle,
+  faExpand,
 } from '@fortawesome/free-solid-svg-icons';
+import VerificationModal from './VerificationModal';
 import toast from 'react-hot-toast';
 
-export default function PassportCertificate({ analysis, persona, userName = 'Candidate Passport Holder' }) {
+export default function PassportCertificate({ analysis, persona, userName }) {
+  const [isVerifyOpen, setIsVerifyOpen] = useState(false);
   const passportId = useRef(`CP-2026-${Math.random().toString(36).substring(2, 7).toUpperCase()}`).current;
   const issueDate = new Date().toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
   });
+
+  const resolvedUserName = (() => {
+    if (userName) return userName;
+    try {
+      const stored = JSON.parse(localStorage.getItem('pathseeker_user') || 'null');
+      if (stored && stored.name) return stored.name;
+    } catch {
+      // ignore
+    }
+    return 'Candidate Passport Holder';
+  })();
 
   const handlePrint = () => {
     window.print();
@@ -70,10 +84,10 @@ export default function PassportCertificate({ analysis, persona, userName = 'Can
               <FontAwesomeIcon icon={faShieldHalved} className="text-2xl" />
             </div>
             <span className="text-[10px] uppercase font-bold tracking-wider text-[#A1A1AA]">
-              Candidate Stage
+              Candidate Name
             </span>
-            <span className="text-sm font-bold text-white uppercase tracking-wide">
-              {persona} Pathway
+            <span className="text-sm font-bold text-white truncate max-w-full">
+              {resolvedUserName}
             </span>
           </div>
 
@@ -124,36 +138,53 @@ export default function PassportCertificate({ analysis, persona, userName = 'Can
             </span>
           </div>
 
-          {/* Simulated QR Code */}
-          <div className="flex items-center gap-2 bg-white/10 px-2.5 py-1.5 rounded-xl border border-white/15">
-            <FontAwesomeIcon icon={faQrcode} className="text-xl text-white" />
-            <span className="text-[9px] font-mono text-[#D4D4D8] leading-tight">
-              SCAN TO<br />VERIFY
+          {/* Interactive QR Code & Scan Trigger */}
+          <button
+            type="button"
+            onClick={() => setIsVerifyOpen(true)}
+            className="flex items-center gap-2 bg-white/10 hover:bg-[#E8602E]/20 px-3 py-1.5 rounded-xl border border-white/15 hover:border-[#E8602E]/50 transition-all cursor-pointer group/qr shadow-sm"
+            title="Click to Open Cryptographic Scanner & QR Code"
+          >
+            <FontAwesomeIcon icon={faQrcode} className="text-xl text-white group-hover/qr:text-[#E8602E] transition-colors" />
+            <span className="text-[9px] font-mono text-[#D4D4D8] text-left leading-tight">
+              SCAN TO<br /><strong className="text-white group-hover/qr:text-[#E8602E]">VERIFY</strong>
             </span>
-          </div>
+          </button>
         </div>
       </div>
 
       {/* Action Buttons for Export & Sharing */}
-      <div className="flex items-center gap-3 mt-6 w-full max-w-md">
+      <div className="flex flex-wrap items-center gap-3 mt-6 w-full max-w-md">
         <button
           type="button"
-          onClick={handlePrint}
-          className="flex-1 btn-primary-orange py-3 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
+          onClick={() => setIsVerifyOpen(true)}
+          className="flex-1 py-3 px-4 rounded-2xl bg-white/[0.08] hover:bg-white/15 text-white text-xs font-bold border border-white/15 transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
-          <FontAwesomeIcon icon={faPrint} />
-          <span>Print / Export PDF</span>
+          <FontAwesomeIcon icon={faQrcode} className="text-[#E8602E]" />
+          <span>Interactive QR Scanner</span>
         </button>
 
         <button
           type="button"
-          onClick={handleShare}
-          className="flex-1 btn-secondary-dark py-3 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer"
+          onClick={handlePrint}
+          className="flex-1 btn-primary-orange py-3 px-4 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-glow-orange-sm"
         >
-          <FontAwesomeIcon icon={faShareNodes} className="text-[#E8602E]" />
-          <span>Share Passport</span>
+          <FontAwesomeIcon icon={faPrint} />
+          <span>Export PDF Dossier</span>
         </button>
       </div>
+
+      {/* Interactive Verification & Scanner Modal */}
+      <VerificationModal
+        isOpen={isVerifyOpen}
+        onClose={() => setIsVerifyOpen(false)}
+        passportId={passportId}
+        candidateName={resolvedUserName}
+        hollandCode={analysis.dominantCodes || 'IA-Tech'}
+        primaryStream={analysis.primaryStream}
+        matchScore={analysis.matchPercentage}
+        issueDate={issueDate}
+      />
     </div>
   );
 }

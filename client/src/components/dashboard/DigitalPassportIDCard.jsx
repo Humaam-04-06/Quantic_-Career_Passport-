@@ -9,14 +9,29 @@ import {
   faBrain,
   faBuilding,
   faAward,
+  faPenToSquare,
+  faExpand,
 } from '@fortawesome/free-solid-svg-icons';
+import VerificationModal from '../quiz/VerificationModal';
 import toast from 'react-hot-toast';
 
-export default function DigitalPassportIDCard({ profile, currentStageConfig }) {
+export default function DigitalPassportIDCard({
+  profile,
+  currentStageConfig,
+  onEditProfile,
+  completedTaskCount = 0,
+  totalTaskCount = 10,
+  onVerifyPassport,
+}) {
   const cardRef = useRef(null);
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
   const [glarePos, setGlarePos] = useState({ x: 50, y: 50 });
+  const [isVerifyOpen, setIsVerifyOpen] = useState(false);
+
+  const isVerified = !!profile.isVerified;
+  const dynamicReadiness = totalTaskCount > 0 ? Math.round((completedTaskCount / totalTaskCount) * 100) : 0;
+  const readinessLevel = dynamicReadiness >= 75 ? 'Level 4' : dynamicReadiness >= 50 ? 'Level 3' : dynamicReadiness >= 25 ? 'Level 2' : 'Level 1';
 
   const handleMouseMove = (e) => {
     if (!cardRef.current) return;
@@ -46,6 +61,9 @@ export default function DigitalPassportIDCard({ profile, currentStageConfig }) {
 
   const handleDownloadBadge = () => {
     toast.success(`Exporting Digital Passport ID Badge for ${profile.name}!`);
+    setTimeout(() => {
+      window.print();
+    }, 500);
   };
 
   return (
@@ -86,7 +104,7 @@ export default function DigitalPassportIDCard({ profile, currentStageConfig }) {
                 PATHSEEKER PASSPORT
               </span>
               <span className="text-[9px] font-mono text-[#A1A1AA] block">
-                UID: {profile.passportUid}
+                UID: {profile.passportUid || 'CPP-2026-GENESIS'}
               </span>
             </div>
           </div>
@@ -96,7 +114,10 @@ export default function DigitalPassportIDCard({ profile, currentStageConfig }) {
             <div className="w-7 h-6 rounded-md bg-gradient-to-br from-[#FFB800] to-[#BC4C22] border border-[#FFB800]/60 flex items-center justify-center shadow-sm">
               <div className="w-4 h-3 border border-black/40 rounded-sm" />
             </div>
-            <FontAwesomeIcon icon={faShieldHalved} className="text-[#10B981] text-sm" />
+            <FontAwesomeIcon
+              icon={faShieldHalved}
+              className={isVerified ? 'text-[#10B981] text-sm' : 'text-amber-400 text-sm'}
+            />
           </div>
         </div>
 
@@ -108,10 +129,20 @@ export default function DigitalPassportIDCard({ profile, currentStageConfig }) {
               alt={profile.name}
               className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-[#E8602E] shadow-glow-orange-sm"
             />
-            <div className="absolute -bottom-1.5 -right-1.5 px-1.5 py-0.5 rounded-full bg-[#10B981] text-black text-[9px] font-extrabold font-mono flex items-center gap-0.5">
-              <FontAwesomeIcon icon={faCheckCircle} />
-              <span>VERIFIED</span>
-            </div>
+            {/* Dynamic Status Badge: VERIFIED vs UNVERIFIED */}
+            <button
+              type="button"
+              onClick={() => !isVerified && setIsVerifyOpen(true)}
+              title={isVerified ? 'Passport Cryptographically Verified' : 'Click to Verify via Email OTP'}
+              className={`absolute -bottom-1.5 -right-1.5 px-2 py-0.5 rounded-full text-[9px] font-extrabold font-mono flex items-center gap-1 border shadow-sm transition-all ${
+                isVerified
+                  ? 'bg-[#10B981] text-black border-[#10B981]'
+                  : 'bg-amber-500/20 text-amber-300 border-amber-500/40 backdrop-blur-md hover:scale-105 hover:bg-amber-500/30 cursor-pointer animate-pulse'
+              }`}
+            >
+              <FontAwesomeIcon icon={isVerified ? faCheckCircle : faShieldHalved} />
+              <span>{isVerified ? 'VERIFIED' : 'UNVERIFIED'}</span>
+            </button>
           </div>
 
           <div className="space-y-1 min-w-0 flex-1">
@@ -132,7 +163,7 @@ export default function DigitalPassportIDCard({ profile, currentStageConfig }) {
           <div className="space-y-0.5">
             <span className="text-[9px] uppercase text-[#71717A] block">Holland Code</span>
             <span className="text-xs font-extrabold text-[#FFB800] block">
-              {profile.hollandCode}
+              {profile.hollandArchetype || 'IRA-94'}
             </span>
           </div>
 
@@ -146,14 +177,14 @@ export default function DigitalPassportIDCard({ profile, currentStageConfig }) {
           <div className="space-y-0.5">
             <span className="text-[9px] uppercase text-[#71717A] block">Issued / Expiry</span>
             <span className="text-[10px] text-white block">
-              {profile.issueDate} - 2029
+              {profile.issueDate || 'August 1, 2026'} - 2029
             </span>
           </div>
 
           <div className="space-y-0.5">
             <span className="text-[9px] uppercase text-[#71717A] block">Readiness</span>
             <span className="text-xs font-extrabold text-[#E8602E] block">
-              {profile.readinessScore}% Level 3
+              {dynamicReadiness}% {readinessLevel}
             </span>
           </div>
         </div>
@@ -165,30 +196,61 @@ export default function DigitalPassportIDCard({ profile, currentStageConfig }) {
               Blockchain Attestation:
             </span>
             <span className="text-[9px] font-mono text-[#A1A1AA] truncate block">
-              {profile.verificationHash}
+              {isVerified ? (profile.verificationHash || '0x8F9A...B34D (Verified)') : 'Verification Pending (Click to Verify)'}
             </span>
           </div>
 
-          {/* Stylized QR Code Visual */}
-          <div className="p-1.5 rounded-xl bg-white text-black flex items-center justify-center shadow-md">
-            <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
+          {/* Interactive Working QR Code Button */}
+          <button
+            type="button"
+            onClick={() => setIsVerifyOpen(true)}
+            className="p-1.5 rounded-xl bg-white text-black hover:bg-[#E8602E] hover:text-white transition-all flex items-center justify-center shadow-md cursor-pointer group/qr hover:scale-105"
+            title="Click to Verify Cryptographic Passport"
+          >
+            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
               <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm10-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm14 0h4v4h-4v-4zm-4-2h2v2h-2v-2zm4 4h2v4h-2v-4zm-4 2h2v2h-2v-2zm2-4h2v2h-2v-2zM5 5h2v2H5V5zm12 0h2v2h-2V5zM5 17h2v2H5v-2z" />
             </svg>
-          </div>
+          </button>
         </div>
       </div>
 
-      {/* Quick Action Button below Card */}
-      <div className="mt-4 flex justify-center">
+      {/* Quick Action Buttons below Card */}
+      <div className="mt-4 flex items-center justify-center gap-2.5 flex-wrap">
         <button
           type="button"
-          onClick={handleDownloadBadge}
-          className="px-5 py-2.5 rounded-2xl bg-white/[0.08] hover:bg-[#E8602E] text-white text-xs font-bold transition-all border border-white/15 flex items-center gap-2 cursor-pointer shadow-glass hover:scale-105"
+          onClick={onEditProfile}
+          className="px-4 py-2.5 rounded-2xl bg-white/[0.08] hover:bg-[#E8602E] text-white text-xs font-bold transition-all border border-white/15 flex items-center gap-2 cursor-pointer shadow-glass hover:scale-105"
         >
-          <FontAwesomeIcon icon={faDownload} />
-          <span>Save Digital Passport Badge</span>
+          <FontAwesomeIcon icon={faPenToSquare} />
+          <span>Edit Profile & Photo</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setIsVerifyOpen(true)}
+          className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all border flex items-center gap-2 cursor-pointer shadow-glass hover:scale-105 ${
+            isVerified
+              ? 'bg-[#10B981]/20 text-[#10B981] border-[#10B981]/40'
+              : 'bg-[#E8602E] text-white border-[#E8602E] shadow-glow-orange-sm animate-pulse'
+          }`}
+        >
+          <FontAwesomeIcon icon={isVerified ? faCheckCircle : faShieldHalved} />
+          <span>{isVerified ? 'Passport Verified' : 'Verify Passport via Email'}</span>
         </button>
       </div>
+
+      {/* Interactive Verification Modal */}
+      <VerificationModal
+        isOpen={isVerifyOpen}
+        onClose={() => setIsVerifyOpen(false)}
+        passportId={profile.passportUid || 'CP-2026-GENESIS'}
+        candidateName={profile.name}
+        candidateEmail={profile.email}
+        hollandCode={profile.hollandArchetype || 'IRA-94'}
+        primaryStream={profile.targetRole}
+        matchScore={dynamicReadiness > 0 ? dynamicReadiness : 90}
+        onVerified={onVerifyPassport}
+      />
     </div>
   );
 }

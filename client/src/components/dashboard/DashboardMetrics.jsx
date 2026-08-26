@@ -10,18 +10,22 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 export default function DashboardMetrics({ profile, completedTaskCount, totalTaskCount }) {
-  const readinessPercent = Math.round((completedTaskCount / (totalTaskCount || 1)) * 100);
+  const readinessPercent = totalTaskCount > 0 ? Math.round((completedTaskCount / totalTaskCount) * 100) : 0;
+  const streak = completedTaskCount > 0 ? Math.min(completedTaskCount, 7) : 1;
+  const sessions = Math.floor(completedTaskCount / 2);
+  const hours = (completedTaskCount * 0.8).toFixed(1);
+  const badges = completedTaskCount >= 8 ? 3 : completedTaskCount >= 4 ? 2 : 1;
 
   const metrics = [
     {
       id: 'readiness',
       title: 'Career Readiness Index',
       value: `${readinessPercent}%`,
-      subtitle: readinessPercent >= 80 ? 'Interview Ready' : 'In Acceleration',
+      subtitle: readinessPercent === 0 ? 'Genesis Level 1' : readinessPercent >= 80 ? 'Interview Ready' : 'In Acceleration',
       icon: faChartLine,
       color: 'text-[#E8602E]',
       bgGlow: 'bg-[#E8602E]/20',
-      badge: 'Mid-Level FAANG Tier',
+      badge: readinessPercent === 0 ? 'Foundation Tier' : 'Mid-Level FAANG Tier',
     },
     {
       id: 'sprints',
@@ -31,23 +35,23 @@ export default function DashboardMetrics({ profile, completedTaskCount, totalTas
       icon: faListCheck,
       color: 'text-[#10B981]',
       bgGlow: 'bg-[#10B981]/20',
-      badge: `${profile.streakDays}-Day Streak 🔥`,
+      badge: `${streak}-Day Streak 🔥`,
     },
     {
       id: 'masterclasses',
       title: 'Masterclass Curriculum',
-      value: `${profile.masterclassesCompleted} Sessions`,
-      subtitle: `${profile.totalHoursWatched} Hrs Watched`,
+      value: `${sessions} Sessions`,
+      subtitle: `${hours} Hrs Watched`,
       icon: faVideo,
       color: 'text-[#FFB800]',
       bgGlow: 'bg-[#FFB800]/20',
-      badge: '+4.2 CEU Credits',
+      badge: profile.isNewUser ? '0.0 CEU Credits' : '+4.2 CEU Credits',
     },
     {
       id: 'badges',
       title: 'Verified Digital Badges',
-      value: `${profile.badgesEarned} Badges`,
-      subtitle: 'RIASEC • K8s • LoRA',
+      value: `${badges} ${badges === 1 ? 'Badge' : 'Badges'}`,
+      subtitle: profile.isNewUser ? 'Career Passport Genesis' : 'RIASEC • K8s • LoRA',
       icon: faAward,
       color: 'text-[#06B6D4]',
       bgGlow: 'bg-[#06B6D4]/20',

@@ -13,14 +13,13 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { STORIES_DATABASE } from '../../data/storiesData';
 
-export default function CoverFlowStoriesSlider({ onSelectStory }) {
-  const [activeIndex, setActiveIndex] = useState(1);
+export default function CoverFlowStoriesSlider({ stories = [], onSelectStory }) {
+  const slides = stories && stories.length > 0 ? stories : STORIES_DATABASE;
+  const [activeIndex, setActiveIndex] = useState(0);
   const cardsRef = useRef([]);
   const containerRef = useRef(null);
   const isDragging = useRef(false);
   const startX = useRef(0);
-
-  const slides = STORIES_DATABASE;
 
   const handlePrev = () => {
     setActiveIndex((prev) => Math.max(0, prev - 1));

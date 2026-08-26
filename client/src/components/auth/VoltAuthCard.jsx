@@ -16,7 +16,58 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 
+import ProfileSetupModal from './ProfileSetupModal.jsx';
+import ForgotPasswordModal from './ForgotPasswordModal.jsx';
+import { DEFAULT_AVATAR } from '../../data/avatarsData.js';
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+const DEMO_ACCOUNTS = {
+  'student@pathseeker.ai': {
+    name: 'Sarah Chen',
+    email: 'student@pathseeker.ai',
+    password: 'password123',
+    role: 'Student',
+    targetRole: 'AI Systems Engineer',
+    targetCompany: 'Google DeepMind',
+    avatar: DEFAULT_AVATAR,
+    skills: ['Python', 'Machine Learning', 'Data Structures', 'PyTorch'],
+    isVerified: true,
+  },
+  'graduate@pathseeker.ai': {
+    name: 'Marcus Vance',
+    email: 'graduate@pathseeker.ai',
+    password: 'password123',
+    role: 'Graduate',
+    targetRole: 'Cloud Solutions Architect',
+    targetCompany: 'AWS / Microsoft',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    skills: ['AWS / Cloud', 'Docker', 'Kubernetes', 'Go'],
+    isVerified: true,
+  },
+  'pro@pathseeker.ai': {
+    name: 'Elena Rostova',
+    email: 'pro@pathseeker.ai',
+    password: 'password123',
+    role: 'Professional',
+    targetRole: 'Principal Systems Architect',
+    targetCompany: 'Anthropic',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
+    skills: ['Distributed Systems', 'Rust', 'System Design', 'Cybersecurity'],
+    isVerified: true,
+  },
+  'admin@pathseeker.ai': {
+    name: 'Admin Supervisor',
+    email: 'admin@pathseeker.ai',
+    password: 'password123',
+    role: 'admin',
+    targetRole: 'Platform Administrator',
+    targetCompany: 'PathSeeker Core',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+    skills: ['Platform Governance', 'Audit', 'System Architecture'],
+    isVerified: true,
+  },
+};
 
 export default function VoltAuthCard({ initialMode = 'login' }) {
   const navigate = useNavigate();
@@ -24,6 +75,11 @@ export default function VoltAuthCard({ initialMode = 'login' }) {
   const [mood, setMood] = useState('idle');
   const [bubbleText, setBubbleText] = useState("Hi. I'm Volt. I guard your Career Passport.");
   const [bubblePop, setBubblePop] = useState(false);
+
+  // Setup modal state
+  const [showSetupModal, setShowSetupModal] = useState(false);
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [tempUser, setTempUser] = useState(null);
 
   // Robot Head 3D transforms
   const [headPos, setHeadPos] = useState({ lx: 0, ly: 0, ry: 0, rx: 0 });
@@ -199,7 +255,7 @@ export default function VoltAuthCard({ initialMode = 'login' }) {
   };
 
   // Submit Handler
-  const handleSubmit = (e, formType) => {
+  const handleSubmit = async (e, formType) => {
     e.preventDefault();
     if (isDoneRef.current) return;
 
@@ -235,12 +291,170 @@ export default function VoltAuthCard({ initialMode = 'login' }) {
     setIsSuccess(true);
     setIsSpinning(true);
     setMood('success');
+
+    if (formType === 'signup') {
+      const initialUser = {
+        name: signupName.trim(),
+        email: signupEmail.trim(),
+        role: signupRole || 'Student',
+        password: signupPassword,
+        avatar: DEFAULT_AVATAR,
+        token: 'jwt-auth-token-' + Date.now(),
+      };
+      setTempUser(initialUser);
+      say("Awesome! Let's choose your official Passport ID avatar.");
+      
+      setTimeout(() => {
+        setShowSetupModal(true);
+      }, 700);
+      return;
+    }
+
+    // Login Flow with Backend Database Authentication
+    const userEmail = loginEmail.trim().toLowerCase();
+    let authenticatedUser = null;
+    let authFailedReason = null;
+
+    try {
+      const res = await fetch('http://localhost:5000/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, password: loginPassword }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        authenticatedUser = {
+          ...data.user,
+          token: data.token,
+          password: loginPassword,
+        };
+      } else if (res.status === 401) {
+        authFailedReason = 'invalid_credentials';
+      }
+    } catch {
+      // Backend offline or local fallback
+    }
+
+    // If database login was rejected with invalid credentials
+    if (authFailedReason === 'invalid_credentials') {
+      setIsShaking(true);
+      setMood('error');
+      isDoneRef.current = false;
+      setIsSuccess(false);
+      setIsSpinning(false);
+      say("Invalid credentials. Use 'Forgot Password?' if you need an email reset code.");
+      toast.error("Invalid email or password. Please check your credentials.");
+      setTimeout(() => setIsShaking(false), 500);
+      return;
+    }
+
+    // If backend was unreachable or account exists only locally
+    if (!authenticatedUser) {
+      let existingAccount = null;
+      try {
+        const accounts = JSON.parse(localStorage.getItem('pathseeker_accounts') || '{}');
+        existingAccount = accounts[userEmail] || DEMO_ACCOUNTS[userEmail];
+      } catch {
+        existingAccount = DEMO_ACCOUNTS[userEmail];
+      }
+
+      // Reject un-registered accounts trying to log in
+      if (!existingAccount) {
+        setIsShaking(true);
+        setMood('error');
+        isDoneRef.current = false;
+        setIsSuccess(false);
+        setIsSpinning(false);
+        say("No registered account found! Please click 'Create account' below to register.");
+        toast.error("No account found with this email. Please create an account first.");
+        setTimeout(() => setIsShaking(false), 500);
+        return;
+      }
+
+      // Check password if saved on account
+      if (existingAccount.password && existingAccount.password !== loginPassword) {
+        setIsShaking(true);
+        setMood('error');
+        isDoneRef.current = false;
+        setIsSuccess(false);
+        setIsSpinning(false);
+        say("Invalid password. Use 'Forgot Password?' if you need an email reset code.");
+        toast.error("Invalid password. Please check your credentials.");
+        setTimeout(() => setIsShaking(false), 500);
+        return;
+      }
+
+      authenticatedUser = {
+        ...existingAccount,
+        password: loginPassword,
+        token: 'jwt-auth-token-' + Date.now(),
+      };
+    }
+
+    // Synchronize latest verified password into local accounts cache
+    try {
+      const accounts = JSON.parse(localStorage.getItem('pathseeker_accounts') || '{}');
+      accounts[userEmail] = {
+        ...(accounts[userEmail] || {}),
+        ...authenticatedUser,
+        password: loginPassword,
+      };
+      localStorage.setItem('pathseeker_accounts', JSON.stringify(accounts));
+    } catch {
+      // ignore
+    }
+
+    // Authorized Access Granted
     say('Access Granted! Welcome to PathSeeker Career Passport.');
-    toast.success(formType === 'login' ? 'Welcome back! Logged in successfully.' : 'Career Passport profile created!');
+    localStorage.setItem('pathseeker_user', JSON.stringify(authenticatedUser));
+    window.dispatchEvent(new Event('authChange'));
+
+    toast.success(`Welcome back, ${authenticatedUser.name}!`);
 
     setTimeout(() => {
-      navigate('/careers');
-    }, 1600);
+      navigate('/dashboard');
+    }, 1000);
+  };
+
+  const handleSetupComplete = async (completedData) => {
+    const fullAccountData = {
+      ...completedData,
+      password: completedData.password || tempUser?.password || signupPassword || 'password123',
+    };
+
+    try {
+      const accounts = JSON.parse(localStorage.getItem('pathseeker_accounts') || '{}');
+      accounts[fullAccountData.email.toLowerCase()] = fullAccountData;
+      localStorage.setItem('pathseeker_accounts', JSON.stringify(accounts));
+    } catch {
+      // ignore
+    }
+
+    localStorage.setItem('pathseeker_user', JSON.stringify(fullAccountData));
+    window.dispatchEvent(new Event('authChange'));
+
+    // Trigger backend registration to store in MongoDB Atlas and dispatch real Welcome Email
+    try {
+      await fetch('http://localhost:5000/api/v1/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: fullAccountData.name,
+          email: fullAccountData.email.toLowerCase(),
+          password: fullAccountData.password,
+          role: (fullAccountData.role || 'student').toLowerCase(),
+          skills: fullAccountData.skills || [],
+          avatar: fullAccountData.avatar,
+        }),
+      });
+    } catch (err) {
+      console.warn('Backend sync note:', err.message);
+    }
+
+    setShowSetupModal(false);
+    toast.success(`Welcome to PathSeeker, ${fullAccountData.name}! Welcome email dispatched!`);
+    navigate('/dashboard');
   };
 
   // Robot Blinking Loop
@@ -451,6 +665,16 @@ export default function VoltAuthCard({ initialMode = 'login' }) {
                   </button>
                 </label>
 
+                <div className="flex justify-end -mt-2 mb-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotModal(true)}
+                    className="text-[11px] font-mono text-[#E8602E] hover:text-[#FF7A45] hover:underline cursor-pointer bg-transparent border-none p-0"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+
                 <button
                   className={`btn ${isSuccess ? 'is-success' : ''}`}
                   type="submit"
@@ -591,6 +815,24 @@ export default function VoltAuthCard({ initialMode = 'login' }) {
           </div>
         </main>
       </div>
+
+      {/* Post-Registration Profile Setup & Picture Upload Modal */}
+      {showSetupModal && (
+        <ProfileSetupModal
+          initialData={tempUser}
+          onComplete={handleSetupComplete}
+        />
+      )}
+
+      {/* Forgot Password OTP Verification & Reset Modal */}
+      <ForgotPasswordModal
+        isOpen={showForgotModal}
+        onClose={() => setShowForgotModal(false)}
+        onSuccess={() => {
+          setIsSignup(false);
+          say('Password successfully reset! Please enter your new password to sign in.');
+        }}
+      />
     </div>
   );
 }

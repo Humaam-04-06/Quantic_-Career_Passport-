@@ -11,6 +11,8 @@ export default function QuizQuestionCard({
   isFirst,
   isLast,
 }) {
+  const isAnswered = value !== undefined && value !== null;
+
   return (
     <div className="w-full max-w-2xl mx-auto p-8 sm:p-10 rounded-[2.5rem] glass-card-interactive shadow-[0_20px_50px_rgba(0,0,0,0.9)] space-y-8 flex flex-col justify-between min-h-[460px]">
       <div>
@@ -42,25 +44,52 @@ export default function QuizQuestionCard({
           <div className="space-y-4 pt-2">
             <div className="flex items-center justify-between">
               <span className="text-xs text-[#A1A1AA]">{question.minLabel}</span>
-              <span className="text-xl font-mono font-extrabold text-[#E8602E] bg-[#E8602E]/10 px-3 py-1 rounded-xl border border-[#E8602E]/30 shadow-sm">
-                {value}/10
+              <span
+                className={`text-xs font-mono font-bold px-3.5 py-1.5 rounded-xl border shadow-sm transition-all ${
+                  isAnswered
+                    ? 'text-[#E8602E] bg-[#E8602E]/10 border-[#E8602E]/40 text-base'
+                    : 'text-[#71717A] bg-white/[0.04] border-white/10'
+                }`}
+              >
+                {isAnswered ? `${value} / 10` : 'Tap a Rating (1 - 10)'}
               </span>
               <span className="text-xs text-[#A1A1AA]">{question.maxLabel}</span>
+            </div>
+
+            {/* 1-10 Interactive Pill Grid */}
+            <div className="grid grid-cols-10 gap-1 sm:gap-1.5 pt-1">
+              {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => {
+                const isSelected = value === num;
+                return (
+                  <button
+                    key={num}
+                    type="button"
+                    onClick={() => onChange(num)}
+                    className={`py-2.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-[#E8602E] text-white border border-white/40 shadow-glow-orange-sm scale-105'
+                        : 'bg-white/[0.04] text-[#A1A1AA] border border-white/10 hover:bg-white/[0.08] hover:text-white'
+                    }`}
+                  >
+                    {num}
+                  </button>
+                );
+              })}
             </div>
 
             <input
               type="range"
               min={question.min}
               max={question.max}
-              value={value}
+              value={isAnswered ? value : 5}
               onChange={(e) => onChange(Number(e.target.value))}
               className="w-full h-3 bg-white/[0.08] backdrop-blur-md rounded-lg appearance-none cursor-pointer accent-[#E8602E]"
             />
 
             <div className="flex justify-between text-[11px] text-[#71717A] px-1">
-              <span>Low Preference</span>
-              <span>Balanced</span>
-              <span>Strong Affinity</span>
+              <span>1 = Low Preference</span>
+              <span>5 = Balanced</span>
+              <span>10 = Strong Affinity</span>
             </div>
           </div>
         )}
@@ -92,8 +121,8 @@ export default function QuizQuestionCard({
             </div>
 
             <div className="flex justify-between text-[11px] text-[#71717A] px-1 pt-1">
-              <span>Strongly Disagree</span>
-              <span>Strongly Agree</span>
+              <span>1 = Strongly Disagree</span>
+              <span>5 = Strongly Agree</span>
             </div>
           </div>
         )}
@@ -157,7 +186,11 @@ export default function QuizQuestionCard({
         <button
           type="button"
           onClick={onNext}
-          className="btn-primary-orange px-6 py-2.5 text-xs font-bold flex items-center gap-2 cursor-pointer shadow-glow-orange-sm hover:scale-105 transition-transform"
+          className={`px-6 py-2.5 text-xs font-bold flex items-center gap-2 cursor-pointer transition-all ${
+            isAnswered
+              ? 'btn-primary-orange shadow-glow-orange-sm hover:scale-105'
+              : 'bg-white/[0.06] hover:bg-white/10 text-[#A1A1AA] hover:text-white border border-white/10'
+          }`}
         >
           <span>{isLast ? 'Analyze My Career Passport' : 'Next Question'}</span>
           <FontAwesomeIcon icon={faArrowRight} className="text-xs" />

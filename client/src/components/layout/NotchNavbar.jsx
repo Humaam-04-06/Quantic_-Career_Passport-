@@ -7,37 +7,83 @@ import {
   faRocket,
   faBars,
   faXmark,
+  faArrowRightFromBracket,
+  faUser,
+  faCompass,
 } from '@fortawesome/free-solid-svg-icons';
+import toast from 'react-hot-toast';
 
 export default function NotchNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState('Overview');
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      return JSON.parse(
+        localStorage.getItem('pathseeker_user') ||
+        localStorage.getItem('user') ||
+        'null'
+      );
+    } catch {
+      return null;
+    }
+  });
+
+  const [activeTab, setActiveTab] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const navLinks = [
-    { name: 'Overview', path: '/' },
+  // Base navigation links (NO 'Overview')
+  const baseNavLinks = [
     { name: 'Careers', path: '/careers' },
     { name: 'Interest Quiz', path: '/quiz' },
     { name: 'Multimedia', path: '/multimedia' },
     { name: 'Success Stories', path: '/stories' },
     { name: 'Resource Library', path: '/resources' },
-    { name: 'Dashboard', path: '/dashboard' },
+  ];
+
+  // Only include 'Dashboard' when user is logged in
+  const navLinks = [
+    ...baseNavLinks,
+    ...(currentUser ? [{ name: 'Dashboard', path: '/dashboard' }] : []),
   ];
 
   const pillRef = useRef(null);
   const containerRef = useRef(null);
+
+  // Sync auth state on storage/authChange event
+  useEffect(() => {
+    const checkAuth = () => {
+      try {
+        const u = JSON.parse(
+          localStorage.getItem('pathseeker_user') ||
+          localStorage.getItem('user') ||
+          'null'
+        );
+        setCurrentUser(u);
+      } catch {
+        setCurrentUser(null);
+      }
+    };
+
+    window.addEventListener('storage', checkAuth);
+    window.addEventListener('authChange', checkAuth);
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('authChange', checkAuth);
+    };
+  }, []);
 
   // Sync active tab with current URL
   useEffect(() => {
     const current = navLinks.find((item) => item.path === location.pathname);
     if (current) {
       setActiveTab(current.name);
+    } else {
+      setActiveTab('');
     }
-  }, [location.pathname]);
+  }, [location.pathname, currentUser]);
 
-  // GSAP magnetic active hover pill animation (Exact Supaste physics)
+  // GSAP magnetic active hover pill animation
   const handleMouseEnter = (e) => {
     if (!pillRef.current || !containerRef.current) return;
     const linkEl = e.currentTarget;
@@ -65,6 +111,15 @@ export default function NotchNavbar() {
       duration: 0.25,
       ease: 'power2.out',
     });
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('pathseeker_user');
+    localStorage.removeItem('user');
+    setCurrentUser(null);
+    window.dispatchEvent(new Event('authChange'));
+    toast.success('Signed out of Career Passport.');
+    navigate('/');
   };
 
   return (
@@ -102,7 +157,7 @@ export default function NotchNavbar() {
           </span>
         </Link>
 
-        {/* 2. DESKTOP NAVIGATION LINKS */}
+        {/* 2. DESKTOP NAVIGATION LINKS (No Overview, Dashboard only when logged in) */}
         <nav
           ref={containerRef}
           onMouseLeave={handleMouseLeave}
@@ -136,13 +191,52 @@ export default function NotchNavbar() {
 
         {/* 3. ACTION CAPSULE BUTTON */}
         <div className="flex items-center gap-2">
-          <Link
-            to="/register"
-            className="group flex items-center gap-1.5 btn-primary-orange px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-md flex-shrink-0"
-          >
-            <FontAwesomeIcon icon={faRocket} className="w-3.5 h-3.5 mb-0.5" />
-            <span>Get Started</span>
-          </Link>
+          {currentUser ? (
+            <div className="flex items-center gap-2">
+              <Link
+                to="/dashboard"
+                className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.08] hover:bg-[#E8602E]/20 border border-white/15 text-xs font-bold text-white transition-all shadow-sm group cursor-pointer"
+              >
+                <span className="max-w-[70px] sm:max-w-[100px] truncate">
+                  {currentUser.name || 'Alex M.'}
+                </span>
+                <img
+                  src={
+                    currentUser.avatar ||
+                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'
+                  }
+                  alt="Avatar"
+                  className="w-5 h-5 rounded-full object-cover border border-[#E8602E]"
+                />
+              </Link>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="p-1.5 rounded-full text-[#A1A1AA] hover:text-red-400 hover:bg-white/10 text-xs transition-colors cursor-pointer"
+                title="Sign Out"
+              >
+                <FontAwesomeIcon icon={faArrowRightFromBracket} />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link
+                to="/login"
+                className="hidden sm:inline-block text-xs font-semibold text-slate-300 hover:text-white px-2 py-1 transition-colors"
+              >
+                Sign In
+              </Link>
+
+              <Link
+                to="/register"
+                className="group flex items-center gap-1.5 btn-primary-orange px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-md flex-shrink-0"
+              >
+                <FontAwesomeIcon icon={faRocket} className="w-3.5 h-3.5 mb-0.5" />
+                <span>Get Started</span>
+              </Link>
+            </div>
+          )}
 
           {/* Mobile Menu Button */}
           <button
@@ -174,21 +268,37 @@ export default function NotchNavbar() {
                 {link.name}
               </button>
             ))}
+
             <div className="pt-2 border-t border-white/10 flex items-center gap-2">
-              <Link
-                to="/login"
-                onClick={() => setMobileOpen(false)}
-                className="flex-1 text-center py-2 rounded-xl bg-white/10 text-white text-xs font-semibold hover:bg-white/15 transition-colors"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                onClick={() => setMobileOpen(false)}
-                className="flex-1 text-center py-2 rounded-xl btn-primary-orange text-xs font-bold"
-              >
-                Sign Up
-              </Link>
+              {currentUser ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full text-center py-2 rounded-xl bg-red-500/20 text-red-400 text-xs font-bold hover:bg-red-500/30 transition-colors"
+                >
+                  Sign Out ({currentUser.name})
+                </button>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex-1 text-center py-2 rounded-xl bg-white/10 text-white text-xs font-semibold hover:bg-white/15 transition-colors"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex-1 text-center py-2 rounded-xl btn-primary-orange text-xs font-bold"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

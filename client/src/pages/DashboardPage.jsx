@@ -8,6 +8,8 @@ import {
   faFire,
   faBrain,
   faFileArrowDown,
+  faGear,
+  faPenToSquare,
 } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import NotchNavbar from '../components/layout/NotchNavbar';
@@ -18,6 +20,8 @@ import RoadmapChecklist from '../components/dashboard/RoadmapChecklist';
 import SkillCompetencyRadar from '../components/dashboard/SkillCompetencyRadar';
 import SavedCareersHub from '../components/dashboard/SavedCareersHub';
 import LearningVault from '../components/dashboard/LearningVault';
+import MyStoriesHub from '../components/dashboard/MyStoriesHub';
+import ProfileEditModal from '../components/dashboard/ProfileEditModal';
 import {
   CANDIDATE_PROFILE,
   ROLE_STAGE_CONFIGS,
@@ -25,27 +29,99 @@ import {
 } from '../data/dashboardData';
 
 export default function DashboardPage() {
-  const [profile, setProfile] = useState(CANDIDATE_PROFILE);
-  const [tasks, setTasks] = useState(INITIAL_ROADMAP_TASKS);
+  const [profile, setProfile] = useState(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('pathseeker_user') || 'null');
+      if (stored) {
+        const userEmailKey = (stored.email || 'guest').toLowerCase();
+        const verifiedOverride = localStorage.getItem(`pathseeker_verified_${userEmailKey}`);
+        return {
+          ...CANDIDATE_PROFILE,
+          name: stored.name || CANDIDATE_PROFILE.name,
+          email: stored.email || CANDIDATE_PROFILE.email,
+          avatar: stored.avatar || CANDIDATE_PROFILE.avatar,
+          roleStage: stored.role || CANDIDATE_PROFILE.roleStage,
+          targetRole: stored.targetRole || CANDIDATE_PROFILE.targetRole,
+          skills: stored.skills || ['Python', 'React', 'Problem Solving'],
+          isNewUser: !!stored.isNewUser,
+          isVerified: verifiedOverride === 'true' ? true : (stored.isVerified !== undefined ? !!stored.isVerified : false),
+        };
+      }
+    } catch {
+      // ignore
+    }
+    return CANDIDATE_PROFILE;
+  });
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [tasks, setTasks] = useState(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('pathseeker_user') || 'null');
+      if (stored) {
+        const userEmailKey = (stored.email || 'guest').toLowerCase();
+        const savedTasks = localStorage.getItem(`pathseeker_tasks_${userEmailKey}`);
+        if (savedTasks) {
+          return JSON.parse(savedTasks);
+        }
+      }
+    } catch {
+      // ignore
+    }
+    // Start all 10 roadmap tasks clean (0% completed) by default for every user
+    return INITIAL_ROADMAP_TASKS.map((t) => ({ ...t, isCompleted: false }));
+  });
 
   const completedTaskCount = tasks.filter((t) => t.isCompleted).length;
   const totalTaskCount = tasks.length;
 
-  const currentStageConfig = ROLE_STAGE_CONFIGS[profile.roleStage];
+  const currentStageConfig = ROLE_STAGE_CONFIGS[profile.roleStage] || ROLE_STAGE_CONFIGS.Student;
 
   const handleStageChange = (stage) => {
     setProfile((prev) => ({ ...prev, roleStage: stage }));
+    try {
+      const stored = JSON.parse(localStorage.getItem('pathseeker_user') || '{}');
+      localStorage.setItem('pathseeker_user', JSON.stringify({ ...stored, role: stage }));
+      window.dispatchEvent(new Event('authChange'));
+    } catch {
+      // ignore
+    }
     toast.success(`Switched dashboard view to ${stage} Track!`);
   };
 
   const handleToggleTask = (taskId) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, isCompleted: !t.isCompleted } : t))
-    );
+    setTasks((prev) => {
+      const updated = prev.map((t) => (t.id === taskId ? { ...t, isCompleted: !t.isCompleted } : t));
+      try {
+        const stored = JSON.parse(localStorage.getItem('pathseeker_user') || 'null');
+        if (stored) {
+          const userEmailKey = (stored.email || 'guest').toLowerCase();
+          localStorage.setItem(`pathseeker_tasks_${userEmailKey}`, JSON.stringify(updated));
+        }
+      } catch {
+        // ignore
+      }
+      return updated;
+    });
   };
 
   const handleAddTask = (newTask) => {
-    setTasks((prev) => [newTask, ...prev]);
+    setTasks((prev) => {
+      const updated = [newTask, ...prev];
+      try {
+        const stored = JSON.parse(localStorage.getItem('pathseeker_user') || 'null');
+        if (stored) {
+          const userEmailKey = (stored.email || 'guest').toLowerCase();
+          localStorage.setItem(`pathseeker_tasks_${userEmailKey}`, JSON.stringify(updated));
+        }
+      } catch {
+        // ignore
+      }
+      return updated;
+    });
+  };
+
+  const handleVerifyPassport = () => {
+    setProfile((prev) => ({ ...prev, isVerified: true }));
   };
 
   const handleExportPdf = () => {
@@ -85,7 +161,7 @@ export default function DashboardPage() {
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold font-display text-white leading-tight">
-              Welcome back, <br />
+              {profile.isNewUser ? 'Welcome to PathSeeker,' : 'Welcome back,'} <br />
               <span className="gradient-text-fire">{profile.name}.</span>
             </h1>
 
@@ -125,6 +201,16 @@ export default function DashboardPage() {
                     </button>
                   );
                 })}
+
+                {/* Edit Profile & Credentials Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="px-4 py-2.5 rounded-2xl text-xs font-bold font-mono transition-all cursor-pointer flex items-center gap-2 bg-white/[0.08] hover:bg-[#E8602E] text-white border border-white/15 shadow-sm hover:scale-105"
+                >
+                  <FontAwesomeIcon icon={faPenToSquare} />
+                  <span>Edit Profile & Security</span>
+                </button>
               </div>
             </div>
           </div>
@@ -134,6 +220,10 @@ export default function DashboardPage() {
             <DigitalPassportIDCard
               profile={profile}
               currentStageConfig={currentStageConfig}
+              onEditProfile={() => setIsEditModalOpen(true)}
+              completedTaskCount={completedTaskCount}
+              totalTaskCount={totalTaskCount}
+              onVerifyPassport={handleVerifyPassport}
             />
           </div>
         </section>
@@ -164,7 +254,12 @@ export default function DashboardPage() {
             SECTION 4: MULTI-AXIS SKILL COMPETENCY RADAR
             ======================================================== */}
         <section>
-          <SkillCompetencyRadar />
+          <SkillCompetencyRadar
+            userSkills={profile.skills || []}
+            completedTaskCount={completedTaskCount}
+            totalTaskCount={totalTaskCount}
+            isNewUser={profile.isNewUser}
+          />
         </section>
 
         {/* ========================================================
@@ -180,7 +275,23 @@ export default function DashboardPage() {
         <section>
           <LearningVault onExportPdf={handleExportPdf} />
         </section>
+
+        {/* ========================================================
+            SECTION 7: MY PUBLISHED TRANSFORMATION STORIES
+            ======================================================== */}
+        <section>
+          <MyStoriesHub userEmail={profile.email} />
+        </section>
       </main>
+
+      {/* Candidate Profile & Security Edit Modal */}
+      {isEditModalOpen && (
+        <ProfileEditModal
+          currentProfile={profile}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={(updated) => setProfile(updated)}
+        />
+      )}
 
       {/* Footer */}
       <Footer />

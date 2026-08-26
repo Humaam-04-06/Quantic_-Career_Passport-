@@ -11,22 +11,36 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { faBookmark as faBookmarkRegular } from '@fortawesome/free-regular-svg-icons';
 import toast from 'react-hot-toast';
+import { storiesApi } from '../../services/api';
 
 export default function StoryCard({ story, onSelectStory }) {
-  const [upvotes, setUpvotes] = useState(story.upvotes);
+  const [upvotes, setUpvotes] = useState(
+    typeof story.upvotes === 'number'
+      ? story.upvotes
+      : typeof story.likesCount === 'number'
+      ? story.likesCount
+      : 0
+  );
   const [isUpvoted, setIsUpvoted] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  const handleUpvote = (e) => {
+  const handleUpvote = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (isUpvoted) {
-      setUpvotes(upvotes - 1);
+      setUpvotes((prev) => Math.max(0, prev - 1));
       setIsUpvoted(false);
     } else {
-      setUpvotes(upvotes + 1);
+      setUpvotes((prev) => prev + 1);
       setIsUpvoted(true);
-      toast.success(`Upvoted ${story.name}'s success story!`);
+      toast.success(`Upvoted ${story.name || story.authorName}'s success story!`);
+      try {
+        if (story._id) {
+          await storiesApi.like(story._id);
+        }
+      } catch {
+        // offline fallback
+      }
     }
   };
 

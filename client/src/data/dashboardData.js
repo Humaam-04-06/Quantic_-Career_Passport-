@@ -2,8 +2,8 @@ export const CANDIDATE_PROFILE = {
   id: 'cand-alex-morgan',
   name: 'Alex Morgan',
   email: 'alex.morgan@pathseeker.ai',
-  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-  roleStage: 'Graduate', // 'Student' | 'Graduate' | 'Professional'
+  avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=VoltCyber&backgroundColor=1e1e2f',
+  roleStage: 'Student', // 'Student' | 'Graduate' | 'Professional'
   targetRole: 'AI & Cloud Solutions Architect',
   targetCompany: 'Anthropic / AWS',
   hollandCode: 'IRA-94',
@@ -12,13 +12,14 @@ export const CANDIDATE_PROFILE = {
   issueDate: 'August 2026',
   expiryDate: 'August 2029',
   verificationHash: '0x8F9A...B34D (Cryptographically Verified)',
-  readinessScore: 88,
-  streakDays: 14,
-  sprintsCompleted: 18,
-  totalSprints: 24,
-  masterclassesCompleted: 4,
-  totalHoursWatched: 8.5,
-  badgesEarned: 3,
+  readinessScore: 0,
+  streakDays: 1,
+  sprintsCompleted: 0,
+  totalSprints: 10,
+  masterclassesCompleted: 0,
+  totalHoursWatched: 0.0,
+  badgesEarned: 1,
+  isVerified: false,
 };
 
 export const ROLE_STAGE_CONFIGS = {
@@ -38,19 +39,19 @@ export const ROLE_STAGE_CONFIGS = {
     stageLabel: 'Executive Mastery & Lateral Pivot',
     badgeColor: 'bg-[#10B981]/20 text-[#10B981] border-[#10B981]/40',
     primaryGoal: 'Strategic Pivot to Foundation AI & Quant Architecture',
-    recommendedSprints: 16,
+    recommendedSprints: 30,
   },
 };
 
 export const INITIAL_ROADMAP_TASKS = [
-  // Stage 1: Foundation & Cognitive Discovery
+  // Stage 1: Cognitive & Foundation Alignment
   {
     id: 'task-1',
     stageNumber: 1,
     stageName: 'Stage 1 • Cognitive Alignment',
     title: 'Complete 7-Step Holland RIASEC Cognitive Assessment',
     category: 'Assessment',
-    isCompleted: true,
+    isCompleted: false,
     timeframe: 'Day 1',
     impactScore: 10,
   },
@@ -60,7 +61,7 @@ export const INITIAL_ROADMAP_TASKS = [
     stageName: 'Stage 1 • Cognitive Alignment',
     title: 'Review RIASEC Radar & Download Career Passport Certificate',
     category: 'Credentials',
-    isCompleted: true,
+    isCompleted: false,
     timeframe: 'Day 3',
     impactScore: 5,
   },
@@ -70,7 +71,7 @@ export const INITIAL_ROADMAP_TASKS = [
     stageName: 'Stage 1 • Cognitive Alignment',
     title: 'Select Primary Career Pathway (AI & Cloud Architect)',
     category: 'Milestone',
-    isCompleted: true,
+    isCompleted: false,
     timeframe: 'Day 7',
     impactScore: 8,
   },
@@ -82,7 +83,7 @@ export const INITIAL_ROADMAP_TASKS = [
     stageName: 'Stage 2 • Core Engineering Sprints',
     title: 'Master Transformer FlashAttention-2 & KV-Cache Math',
     category: 'Masterclass',
-    isCompleted: true,
+    isCompleted: false,
     timeframe: 'Day 15',
     impactScore: 12,
   },
@@ -92,7 +93,7 @@ export const INITIAL_ROADMAP_TASKS = [
     stageName: 'Stage 2 • Core Engineering Sprints',
     title: 'Deploy Multi-Region Kubernetes Cluster via Terraform GitOps',
     category: 'Hands-on Lab',
-    isCompleted: true,
+    isCompleted: false,
     timeframe: 'Day 30',
     impactScore: 15,
   },

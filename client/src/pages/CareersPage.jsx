@@ -17,6 +17,8 @@ import {
   faFire,
   faGraduationCap,
 } from '@fortawesome/free-solid-svg-icons';
+import { userApi } from '../services/api';
+import AuthPromptModal from '../components/auth/AuthPromptModal';
 import toast from 'react-hot-toast';
 
 export default function CareersPage() {
@@ -25,9 +27,16 @@ export default function CareersPage() {
   const [minSalary, setMinSalary] = useState(50000);
   const [experienceLevel, setExperienceLevel] = useState('All');
 
-  const [bookmarkedIds, setBookmarkedIds] = useState([]);
+  const [bookmarkedIds, setBookmarkedIds] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('pathseeker_bookmarks') || '["ai-ml-engineer", "full-stack-engineer", "cloud-architect"]');
+    } catch {
+      return ["ai-ml-engineer", "full-stack-engineer", "cloud-architect"];
+    }
+  });
   const [comparedIds, setComparedIds] = useState([]);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+  const [isAuthPromptOpen, setIsAuthPromptOpen] = useState(false);
 
   // Filter logic
   const filteredCareers = useMemo(() => {
@@ -55,18 +64,44 @@ export default function CareersPage() {
     });
   }, [selectedDomain, searchQuery, minSalary, experienceLevel]);
 
-  // Bookmarking handler
-  const handleToggleBookmark = (id) => {
-    setBookmarkedIds((prev) => {
-      const exists = prev.includes(id);
-      if (exists) {
-        toast('Removed from saved bookmarks', { icon: '📌' });
-        return prev.filter((item) => item !== id);
-      } else {
-        toast.success('Career saved to your Passport collection!');
-        return [...prev, id];
+  // Bookmarking handler with authentication gate & 1-click database sync
+  const handleToggleBookmark = async (id) => {
+    try {
+      const user = JSON.parse(localStorage.getItem('pathseeker_user') || 'null');
+      if (!user) {
+        setIsAuthPromptOpen(true);
+        return;
       }
-    });
+    } catch {
+      setIsAuthPromptOpen(true);
+      return;
+    }
+
+    const exists = bookmarkedIds.includes(id);
+    const updated = exists
+      ? bookmarkedIds.filter((item) => item !== id)
+      : [...bookmarkedIds, id];
+
+    setBookmarkedIds(updated);
+    try {
+      localStorage.setItem('pathseeker_bookmarks', JSON.stringify(updated));
+      window.dispatchEvent(new Event('bookmarksChange'));
+    } catch {
+      // ignore
+    }
+
+    if (exists) {
+      toast('Removed from saved bookmarks', { icon: '📌' });
+    } else {
+      toast.success('Career pinned to your Passport Dashboard!');
+    }
+
+    // Call live MongoDB API if online
+    try {
+      await userApi.toggleBookmark('career', id);
+    } catch {
+      // offline fallback persisted
+    }
   };
 
   // Compare handler (max 3)
@@ -313,6 +348,14 @@ export default function CareersPage() {
           onClose={() => setIsCompareModalOpen(false)}
         />
       )}
+
+      {/* Unauthenticated Login Prompt Modal */}
+      <AuthPromptModal
+        isOpen={isAuthPromptOpen}
+        onClose={() => setIsAuthPromptOpen(false)}
+        title="Sign In to Save Career"
+        message="Sign in to your PathSeeker account to save career blueprints, track 90-day roadmaps, and sync your digital Career Passport."
+      />
 
       {/* Footer */}
       <Footer />

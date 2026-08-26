@@ -9,6 +9,8 @@ import {
   faCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import { faBookmark as faBookmarkRegular } from '@fortawesome/free-regular-svg-icons';
+import AuthPromptModal from '../auth/AuthPromptModal.jsx';
+import toast from 'react-hot-toast';
 
 export function PassportDetailItem({ icon, label, value }) {
   return (
@@ -55,6 +57,24 @@ export default function CareerPassportCard({
 }) {
   const navigate = useNavigate();
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const handleToggleBookmark = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('pathseeker_user') || 'null');
+      if (!user) {
+        setIsAuthModalOpen(true);
+        return;
+      }
+      const nextState = !isBookmarked;
+      setIsBookmarked(nextState);
+      toast(nextState ? 'Saved to your Career Passport!' : 'Removed from saved', {
+        icon: nextState ? '⭐' : '📌',
+      });
+    } catch {
+      setIsAuthModalOpen(true);
+    }
+  };
 
   return (
     <div className="relative rounded-[2rem] overflow-hidden transition-all duration-300 w-full sm:w-[19.5rem] lg:w-[21.5rem] glass-card-interactive group flex flex-col justify-between h-[33rem] p-3.5">
@@ -137,11 +157,19 @@ export default function CareerPassportCard({
 
             <PassportBookmarkBtn
               isBookmarked={isBookmarked}
-              onToggle={() => setIsBookmarked(!isBookmarked)}
+              onToggle={handleToggleBookmark}
             />
           </div>
         </div>
       </div>
+
+      {/* Unauthenticated Login Prompt Modal */}
+      <AuthPromptModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        title="Sign In to Save Passport"
+        message="Create your free account or sign in to bookmark career passports, track milestones, and access personalized blueprints."
+      />
     </div>
   );
 }

@@ -44,6 +44,46 @@ const userProfileSchema = new mongoose.Schema({
     type: String,
     default: 'Technology',
   },
+  passportUid: {
+    type: String,
+    default: function() {
+      return `CPP-2026-${Math.floor(1000 + Math.random() * 9000)}X`;
+    },
+  },
+  hollandCode: {
+    type: String,
+    default: 'IRA-94',
+  },
+  readinessScore: {
+    type: Number,
+    default: 88,
+  },
+  streakDays: {
+    type: Number,
+    default: 14,
+  },
+  targetRole: {
+    type: String,
+    default: 'AI & Cloud Solutions Architect',
+  },
+  targetCompany: {
+    type: String,
+    default: 'Anthropic / AWS',
+  },
+  savedCareers: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Career',
+  }],
+  checklistTasks: [{
+    id: String,
+    stageNumber: Number,
+    stageName: String,
+    title: String,
+    category: String,
+    isCompleted: { type: Boolean, default: false },
+    timeframe: String,
+    impactScore: Number,
+  }],
   preferredSalaryRange: {
     min: { type: Number, default: 0 },
     max: { type: Number, default: 0 },

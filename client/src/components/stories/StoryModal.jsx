@@ -83,14 +83,39 @@ export default function StoryModal({ story, onClose }) {
           </h4>
 
           <div className="space-y-4">
-            {story.stages.map((stage) => (
+            {(story.stages && story.stages.length > 0
+              ? story.stages
+              : [
+                  {
+                    stageNumber: 1,
+                    stageName: 'Starting Ground',
+                    title: story.previousRole || 'Career Pivot Starting Point',
+                    description: `Worked as ${story.previousRole || 'entry level'} earning ${story.previousSalary || '$38,000'}.`,
+                    timeframe: 'Month 0',
+                  },
+                  {
+                    stageNumber: 2,
+                    stageName: 'The Pivot & Roadblocks',
+                    title: 'PathSeeker Technical Roadmap Mastery',
+                    description: 'Executed 90-day technical sprints, constructed production-grade capstone architectures, and prepared system design interviews.',
+                    timeframe: `Months 1–${story.timeToTransition?.split(' ')[0] || 5}`,
+                  },
+                  {
+                    stageNumber: 3,
+                    stageName: 'Verified Outcome',
+                    title: `${story.currentRole || 'Engineer'} Offer at ${story.currentCompany || 'Tech Company'}`,
+                    description: `Signed placement offer with ${story.salaryIncrease || '+300%'} compensation jump (${story.currentSalary || '$165,000'}).`,
+                    timeframe: story.timeToTransition || '6 Months',
+                  },
+                ]
+            ).map((stage, idx) => (
               <div
-                key={stage.stageNumber}
+                key={stage.stageNumber || idx}
                 className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2 relative"
               >
                 <div className="flex items-center justify-between">
                   <span className="px-2.5 py-0.5 rounded-md bg-[#E8602E]/20 text-[#E8602E] font-mono text-[10px] font-bold">
-                    Stage {stage.stageNumber} • {stage.stageName}
+                    Stage {stage.stageNumber || idx + 1} • {stage.stageName || 'Milestone'}
                   </span>
                   <span className="text-[10px] font-mono text-[#71717A]">{stage.timeframe}</span>
                 </div>
@@ -101,37 +126,44 @@ export default function StoryModal({ story, onClose }) {
           </div>
         </div>
 
-        {/* Candidate Advice & Tools Stack */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-white/10">
+        {/* Golden Advice */}
+        {story.advice && story.advice.length > 0 && (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-[#FFB800]">
+            <h4 className="text-sm font-bold text-[#FFB800] uppercase font-mono tracking-wider flex items-center gap-2">
               <FontAwesomeIcon icon={faLightbulb} />
-              <span>Golden Advice for Beginners:</span>
-            </div>
-            <ul className="space-y-2 text-xs text-[#D4D4D8] list-disc list-inside leading-relaxed">
-              {story.advice.map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-[#E8602E]">
-              <FontAwesomeIcon icon={faWrench} />
-              <span>Core Tool Stack Mastered:</span>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              {story.toolsUsed.map((tool) => (
-                <span
-                  key={tool}
-                  className="px-2.5 py-1 rounded-lg bg-white/10 text-white font-mono text-xs border border-white/10"
+              <span>Golden Advice for Aspiring Engineers:</span>
+            </h4>
+            <div className="space-y-2">
+              {story.advice.map((adv, idx) => (
+                <div
+                  key={idx}
+                  className="p-3.5 rounded-xl bg-[#FFB800]/10 border border-[#FFB800]/20 text-xs text-[#E4E4E7]"
                 >
-                  {tool}
+                  {adv}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tech Stack Chips */}
+        {story.toolsUsed && story.toolsUsed.length > 0 && (
+          <div className="space-y-2 pt-2 border-t border-white/10">
+            <span className="text-[10px] uppercase font-mono text-[#71717A] tracking-wider block">
+              Core Tech Stack Mastered:
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {(Array.isArray(story.toolsUsed) ? story.toolsUsed : story.toolsUsed.split(',')).map((tool, idx) => (
+                <span
+                  key={idx}
+                  className="px-3 py-1 rounded-lg bg-white/[0.06] border border-white/10 text-xs font-mono text-white"
+                >
+                  {typeof tool === 'string' ? tool.trim() : tool}
                 </span>
               ))}
             </div>
           </div>
-        </div>
+        )}
 
         {/* Footer Link to Career Pathway */}
         <div className="pt-4 border-t border-white/10 flex items-center justify-between">

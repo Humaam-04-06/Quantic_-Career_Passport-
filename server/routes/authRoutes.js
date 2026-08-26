@@ -7,6 +7,9 @@ import {
   uploadResume,
   forgotPassword,
   resetPassword,
+  updatePassword,
+  sendPassportVerificationOtp,
+  verifyPassportOtp,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { upload } from '../middleware/uploadMiddleware.js';
@@ -17,6 +20,9 @@ router.post('/register', register);
 router.post('/login', login);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
+router.put('/update-password', updatePassword);
+router.post('/send-verification-otp', sendPassportVerificationOtp);
+router.post('/verify-passport-otp', verifyPassportOtp);
 
 router.get('/me', protect, getMe);
 router.put('/profile', protect, updateProfile);
