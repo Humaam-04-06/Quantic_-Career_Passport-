@@ -138,7 +138,7 @@ export default function StorySubmitForm() {
         // ignore
       }
 
-      toast.success('🎉 Your transformation story has been published to the community feed!');
+      toast.success('Your transformation story has been published to the community feed!');
       setTimeout(() => {
         navigate('/stories');
       }, 1200);

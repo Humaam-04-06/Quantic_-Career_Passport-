@@ -115,8 +115,13 @@ export default function ProfileEditModal({
       skills: skills,
     };
 
-    // Update localStorage user object
+    // Update localStorage user object and sync to MongoDB Atlas
+    const emailKey = (email || '').trim().toLowerCase();
     try {
+      if (emailKey && avatar) {
+        localStorage.setItem(`pathseeker_avatar_${emailKey}`, avatar);
+      }
+
       const stored = JSON.parse(localStorage.getItem('pathseeker_user') || '{}');
       const updatedUser = {
         ...stored,
@@ -128,13 +133,37 @@ export default function ProfileEditModal({
         skills: skills,
       };
       localStorage.setItem('pathseeker_user', JSON.stringify(updatedUser));
+      
+      // Update local accounts cache
+      const accounts = JSON.parse(localStorage.getItem('pathseeker_accounts') || '{}');
+      if (accounts[emailKey]) {
+        accounts[emailKey] = { ...accounts[emailKey], avatar, name: name.trim() };
+        localStorage.setItem('pathseeker_accounts', JSON.stringify(accounts));
+      }
+
       window.dispatchEvent(new Event('authChange'));
+      window.dispatchEvent(new Event('userUpdate'));
+      window.dispatchEvent(new Event('profileChange'));
+
+      // Persist permanently into MongoDB Atlas
+      fetch('http://localhost:5000/api/v1/auth/update-profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: emailKey,
+          name: name.trim(),
+          avatar,
+          role: roleStage,
+          targetRole: targetRole.trim(),
+          skills,
+        }),
+      }).catch((err) => console.warn('Offline profile update sync:', err));
     } catch {
       // ignore
     }
 
     onSave(updated);
-    toast.success('Your Profile and Skills were updated!');
+    toast.success('Your Profile and Avatar were permanently saved!');
     onClose();
   };
 

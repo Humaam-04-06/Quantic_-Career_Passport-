@@ -35,7 +35,7 @@ export default function DashboardMetrics({ profile, completedTaskCount, totalTas
       icon: faListCheck,
       color: 'text-[#10B981]',
       bgGlow: 'bg-[#10B981]/20',
-      badge: `${streak}-Day Streak 🔥`,
+      badge: `${streak}-Day Active Streak`,
     },
     {
       id: 'masterclasses',

@@ -91,7 +91,7 @@ export default function CareersPage() {
     }
 
     if (exists) {
-      toast('Removed from saved bookmarks', { icon: '📌' });
+      toast.success('Removed from saved bookmarks');
     } else {
       toast.success('Career pinned to your Passport Dashboard!');
     }

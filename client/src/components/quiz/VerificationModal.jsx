@@ -120,7 +120,7 @@ export default function VerificationModal({
       }
 
       setVerifiedSuccess(true);
-      toast.success('🎉 Congratulations! Your Career Passport is cryptographically VERIFIED!');
+      toast.success('Congratulations! Your Career Passport is cryptographically VERIFIED!');
       onVerified?.();
 
       setTimeout(() => {

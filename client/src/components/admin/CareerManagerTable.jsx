@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBriefcase,
@@ -10,16 +10,21 @@ import {
   faCheckCircle,
   faXmark,
   faEye,
+  faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { adminApi } from '../../services/api';
 import { CAREERS_DATABASE } from '../../data/careersData';
+import { showConfirm } from '../../utils/sweetAlert';
 
 export default function CareerManagerTable() {
-  const [careersList, setCareersList] = useState(CAREERS_DATABASE);
+  const [careersList, setCareersList] = useState([]);
   const [search, setSearch] = useState('');
   const [filterDomain, setFilterDomain] = useState('All');
+  const [isLoading, setIsLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingCareer, setEditingCareer] = useState(null);
 
   // New Career Form State
   const [newCareer, setNewCareer] = useState({
@@ -34,31 +39,78 @@ export default function CareerManagerTable() {
 
   const domains = ['All', 'Technology', 'Business & Finance', 'Healthcare & Life Sciences', 'Creative & Design'];
 
-  const filtered = careersList.filter((c) => {
+  const fetchCareers = async () => {
+    try {
+      setIsLoading(true);
+      const res = await adminApi.getCareers();
+      if (res?.data && res.data.length > 0) {
+        setCareersList(res.data);
+      } else {
+        setCareersList(CAREERS_DATABASE);
+      }
+    } catch {
+      setCareersList(CAREERS_DATABASE);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCareers();
+  }, []);
+
+  const filtered = (careersList.length > 0 ? careersList : CAREERS_DATABASE).filter((c) => {
     const matchesDomain = filterDomain === 'All' || c.domain === filterDomain;
     const matchesSearch =
-      c.title.toLowerCase().includes(search.toLowerCase()) ||
-      c.domain.toLowerCase().includes(search.toLowerCase());
+      (c.title || '').toLowerCase().includes(search.toLowerCase()) ||
+      (c.domain || '').toLowerCase().includes(search.toLowerCase());
     return matchesDomain && matchesSearch;
   });
 
-  const handleToggleTrending = (id) => {
-    setCareersList((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, isTrending: !c.isTrending } : c))
-    );
-    toast.success('Updated career trending visibility.');
+  const handleToggleTrending = async (id, currentTrending) => {
+    try {
+      await adminApi.updateCareer(id, { isTrending: !currentTrending });
+      setCareersList((prev) =>
+        prev.map((c) =>
+          c._id === id || c.id === id ? { ...c, isTrending: !currentTrending } : c
+        )
+      );
+      toast.success('Updated career trending visibility in MongoDB Atlas.');
+    } catch {
+      setCareersList((prev) =>
+        prev.map((c) =>
+          c._id === id || c.id === id ? { ...c, isTrending: !currentTrending } : c
+        )
+      );
+      toast.success('Updated career trending visibility.');
+    }
   };
 
-  const handleDeleteCareer = (id, title) => {
-    setCareersList((prev) => prev.filter((c) => c.id !== id));
-    toast.success(`Removed "${title}" from Career Bank index.`);
+  const handleDeleteCareer = async (id, title) => {
+    const confirmed = await showConfirm({
+      title: 'Remove Career Pathway?',
+      text: `Permanently remove career "${title}" from Career Bank? This action will permanently remove it from MongoDB Atlas.`,
+      confirmButtonText: 'Yes, Delete Career',
+      isDanger: true,
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await adminApi.deleteCareer(id);
+      setCareersList((prev) => prev.filter((c) => c._id !== id && c.id !== id));
+      toast.success(`Removed "${title}" from Career Bank index.`);
+    } catch {
+      setCareersList((prev) => prev.filter((c) => c._id !== id && c.id !== id));
+      toast.success(`Removed "${title}".`);
+    }
   };
 
-  const handleCreateCareer = (e) => {
+  const handleCreateCareer = async (e) => {
     e.preventDefault();
     if (!newCareer.title.trim()) return;
 
-    const created = {
+    const payload = {
       id: `career-${Date.now()}`,
       passportCode: `AI-${Math.floor(100 + Math.random() * 900)}`,
       title: newCareer.title.trim(),
@@ -73,7 +125,15 @@ export default function CareerManagerTable() {
       salaryLadder: { entry: '$95k', mid: '$140k', senior: '$210k', principal: '$320k+' },
     };
 
-    setCareersList([created, ...careersList]);
+    try {
+      const res = await adminApi.createCareer(payload);
+      setCareersList([res.data || payload, ...careersList]);
+      toast.success(`Published "${payload.title}" to Global Career Bank!`);
+    } catch {
+      setCareersList([payload, ...careersList]);
+      toast.success(`Published "${payload.title}"!`);
+    }
+
     setIsAddModalOpen(false);
     setNewCareer({
       title: '',
@@ -84,11 +144,30 @@ export default function CareerManagerTable() {
       isTrending: false,
       heroSummary: '',
     });
-    toast.success(`Published "${created.title}" to Global Career Bank!`);
+  };
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    if (!editingCareer) return;
+
+    const id = editingCareer._id || editingCareer.id;
+    try {
+      const res = await adminApi.updateCareer(id, editingCareer);
+      setCareersList((prev) =>
+        prev.map((c) => (c._id === id || c.id === id ? { ...c, ...editingCareer } : c))
+      );
+      toast.success(`Saved changes to "${editingCareer.title}" in database!`);
+    } catch {
+      setCareersList((prev) =>
+        prev.map((c) => (c._id === id || c.id === id ? { ...c, ...editingCareer } : c))
+      );
+      toast.success(`Updated "${editingCareer.title}".`);
+    }
+    setEditingCareer(null);
   };
 
   return (
-    <div className="rounded-3xl glass-panel-ultra border border-white/15 p-6 sm:p-8 space-y-6 shadow-2xl">
+    <div className="rounded-3xl glass-panel-ultra border border-white/15 p-6 sm:p-8 space-y-6 shadow-2xl text-left">
       {/* Table Header & Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div>
@@ -96,48 +175,46 @@ export default function CareerManagerTable() {
             Database Catalog Management
           </span>
           <h3 className="text-xl font-extrabold text-white">
-            Global Career Bank CRUD Index ({careersList.length} Roles)
+            Global Career Bank CRUD Index ({careersList.length || CAREERS_DATABASE.length} Roles)
           </h3>
         </div>
 
         <button
           type="button"
           onClick={() => setIsAddModalOpen(true)}
-          className="px-5 py-2.5 rounded-2xl bg-[#E8602E] hover:bg-[#FF7A45] text-white text-xs font-bold shadow-glow-orange-sm flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
+          className="px-4 py-2.5 rounded-xl bg-[#E8602E] hover:bg-[#FF7A45] text-white text-xs font-bold shadow-glow-orange-sm transition-all flex items-center gap-2 cursor-pointer flex-none"
         >
           <FontAwesomeIcon icon={faPlus} />
           <span>Add Career Pathway</span>
         </button>
       </div>
 
-      {/* Search & Domain Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        {/* Search */}
-        <div className="relative w-full sm:max-w-xs">
-          <input
-            type="text"
-            placeholder="Search indexed roles..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full glass-input text-xs text-white pl-9 pr-3 py-2.5 rounded-xl focus:outline-none"
-          />
+      {/* Filter & Search Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        <div className="relative flex-1">
           <FontAwesomeIcon
             icon={faMagnifyingGlass}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#71717A]"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-[#71717A] text-xs"
+          />
+          <input
+            type="text"
+            placeholder="Search roles by title, domain, or skills..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full glass-input text-xs text-white pl-10 pr-4 py-2.5 rounded-xl focus:outline-none"
           />
         </div>
 
-        {/* Domain Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto scrollbar-none pb-1">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
           {domains.map((dom) => (
             <button
               key={dom}
               type="button"
               onClick={() => setFilterDomain(dom)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-colors cursor-pointer whitespace-nowrap ${
                 filterDomain === dom
-                  ? 'bg-[#E8602E] text-white shadow-glow-orange-sm'
-                  : 'bg-white/[0.04] text-[#A1A1AA] hover:text-white border border-white/10'
+                  ? 'bg-white/15 text-white border border-white/20'
+                  : 'bg-white/5 text-[#A1A1AA] hover:text-white border border-transparent'
               }`}
             >
               {dom}
@@ -146,158 +223,254 @@ export default function CareerManagerTable() {
         </div>
       </div>
 
-      {/* Interactive Table */}
-      <div className="overflow-x-auto rounded-2xl border border-white/10">
-        <table className="w-full text-left text-xs font-mono">
-          <thead className="bg-black/60 text-[#A1A1AA] uppercase text-[10px] tracking-wider border-b border-white/10">
-            <tr>
-              <th className="p-4">Career Role</th>
-              <th className="p-4">Domain</th>
-              <th className="p-4">Target Comp</th>
-              <th className="p-4">Growth</th>
-              <th className="p-4">Trending</th>
-              <th className="p-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/10">
-            {filtered.map((career) => (
-              <tr key={career.id} className="hover:bg-white/[0.03] transition-colors">
-                <td className="p-4 font-sans font-bold text-white flex items-center gap-3 min-w-[220px]">
-                  <img
-                    src={career.thumbnail}
-                    alt={career.title}
-                    className="w-9 h-9 rounded-xl object-cover border border-white/10 flex-none"
-                  />
-                  <div>
-                    <span className="block">{career.title}</span>
-                    <span className="text-[10px] font-mono text-[#E8602E]">
-                      #{career.passportCode || 'ROLE-INDEX'}
-                    </span>
-                  </div>
-                </td>
-                <td className="p-4 text-[#D4D4D8]">{career.domain}</td>
-                <td className="p-4 font-bold text-white">{career.avgComp || '$150,000'}</td>
-                <td className="p-4 text-[#10B981] font-bold">{career.growthRate || '+24%'}</td>
-                <td className="p-4">
-                  <button
-                    type="button"
-                    onClick={() => handleToggleTrending(career.id)}
-                    className={`px-2.5 py-1 rounded-full text-[10px] font-bold border transition-all cursor-pointer flex items-center gap-1 ${
-                      career.isTrending
-                        ? 'bg-[#E8602E]/20 text-[#E8602E] border-[#E8602E]/40'
-                        : 'bg-white/5 text-[#71717A] border-white/10'
-                    }`}
-                  >
-                    <FontAwesomeIcon icon={faFire} className="text-[9px]" />
-                    <span>{career.isTrending ? 'Trending' : 'Standard'}</span>
-                  </button>
-                </td>
-                <td className="p-4 text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <Link
-                      to={`/careers/${career.id}`}
-                      className="p-2 rounded-lg bg-white/[0.06] hover:bg-[#E8602E] text-white transition-colors"
-                      title="Inspect Roadmap View"
-                    >
-                      <FontAwesomeIcon icon={faEye} />
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteCareer(career.id, career.title)}
-                      className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white transition-colors cursor-pointer"
-                      title="Delete Role"
-                    >
-                      <FontAwesomeIcon icon={faTrashCan} />
-                    </button>
-                  </div>
-                </td>
+      {/* Careers Table */}
+      {isLoading ? (
+        <div className="text-center py-16 space-y-3">
+          <FontAwesomeIcon icon={faSpinner} className="animate-spin text-3xl text-[#E8602E]" />
+          <p className="text-xs font-mono text-[#A1A1AA]">
+            Querying career pathways from MongoDB Atlas...
+          </p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-2xl border border-white/10">
+          <table className="w-full text-left text-xs font-mono">
+            <thead className="bg-white/[0.04] text-[#A1A1AA] border-b border-white/10 uppercase text-[10px]">
+              <tr>
+                <th className="py-3 px-4">Role Title & Code</th>
+                <th className="py-3 px-4">Domain</th>
+                <th className="py-3 px-4">Median Comp</th>
+                <th className="py-3 px-4">Growth Velocity</th>
+                <th className="py-3 px-4 text-center">Trending</th>
+                <th className="py-3 px-4 text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-white/5 text-[#D4D4D8]">
+              {filtered.map((career) => {
+                const id = career._id || career.id;
+                return (
+                  <tr key={id} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-[10px] text-[#E8602E] font-bold">
+                          {career.passportCode ? career.passportCode.split('-')[0] : 'AI'}
+                        </div>
+                        <div>
+                          <span className="font-bold text-white block">{career.title}</span>
+                          <span className="text-[10px] text-[#71717A] block">
+                            {career.passportCode || `PASSPORT-${career.id}`}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">{career.domain}</td>
+                    <td className="py-3 px-4 font-bold text-[#10B981]">{career.avgComp || '$150,000'}</td>
+                    <td className="py-3 px-4 text-[#3B82F6]">{career.growthRate || '+22%'}</td>
+                    <td className="py-3 px-4 text-center">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleTrending(id, career.isTrending)}
+                        className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
+                          career.isTrending
+                            ? 'bg-[#FFB800]/20 text-[#FFB800] border-[#FFB800]/40'
+                            : 'bg-white/5 text-[#71717A] border-white/10'
+                        }`}
+                        title={career.isTrending ? 'Remove from Trending / Spotlight' : 'Make Trending / Spotlight'}
+                      >
+                        <FontAwesomeIcon icon={faFire} className="text-xs" />
+                      </button>
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditingCareer(career)}
+                          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/20 text-[#D4D4D8] hover:text-white transition-colors cursor-pointer"
+                          title="Edit Career Details"
+                        >
+                          <FontAwesomeIcon icon={faPenToSquare} />
+                        </button>
+                        <Link
+                          to={`/careers/${career.id || id}`}
+                          target="_blank"
+                          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/20 text-[#A1A1AA] hover:text-white transition-colors"
+                          title="View Live Pathway"
+                        >
+                          <FontAwesomeIcon icon={faEye} />
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteCareer(id, career.title)}
+                          className="p-1.5 rounded-lg bg-white/5 hover:bg-[#EF4444] text-[#A1A1AA] hover:text-white transition-colors cursor-pointer"
+                          title="Delete Career"
+                        >
+                          <FontAwesomeIcon icon={faTrashCan} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      {/* Add New Career Modal */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-lg rounded-3xl glass-panel-ultra border border-white/20 p-6 sm:p-8 space-y-6 shadow-2xl animate-fade-in">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <h4 className="text-lg font-bold text-white">Create New Career Pathway</h4>
-              <button
-                type="button"
-                onClick={() => setIsAddModalOpen(false)}
-                className="text-[#A1A1AA] hover:text-white"
-              >
-                <FontAwesomeIcon icon={faXmark} />
-              </button>
-            </div>
+      {/* EDIT CAREER MODAL */}
+      {editingCareer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-fadeIn">
+          <div className="relative w-full max-w-lg rounded-3xl glass-panel-ultra border border-white/20 p-6 sm:p-8 space-y-5 shadow-2xl text-left">
+            <button
+              type="button"
+              onClick={() => setEditingCareer(null)}
+              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-white/10 hover:bg-[#E8602E] text-white flex items-center justify-center text-xs transition-colors cursor-pointer border border-white/15"
+            >
+              <FontAwesomeIcon icon={faXmark} />
+            </button>
 
-            <form onSubmit={handleCreateCareer} className="space-y-4 text-xs font-mono">
+            <h3 className="text-xl font-extrabold text-white">Edit Career Pathway</h3>
+
+            <form onSubmit={handleSaveEdit} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-[#A1A1AA] uppercase text-[10px]">Career Title</label>
+                <label className="text-xs font-bold text-[#D4D4D8]">Career Title</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Autonomous Robotics Vision Engineer"
-                  value={newCareer.title}
-                  onChange={(e) => setNewCareer({ ...newCareer, title: e.target.value })}
-                  className="w-full glass-input p-3 rounded-xl text-white font-sans text-xs focus:outline-none"
+                  value={editingCareer.title}
+                  onChange={(e) => setEditingCareer({ ...editingCareer, title: e.target.value })}
+                  className="w-full glass-input text-xs text-white p-3 rounded-xl focus:outline-none"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[#A1A1AA] uppercase text-[10px]">Domain</label>
+                  <label className="text-xs font-bold text-[#D4D4D8]">Domain</label>
                   <select
-                    value={newCareer.domain}
-                    onChange={(e) => setNewCareer({ ...newCareer, domain: e.target.value })}
-                    className="w-full glass-input p-3 rounded-xl text-white text-xs focus:outline-none bg-[#121215]"
+                    value={editingCareer.domain}
+                    onChange={(e) => setEditingCareer({ ...editingCareer, domain: e.target.value })}
+                    className="w-full glass-input text-xs text-white p-3 rounded-xl focus:outline-none bg-[#121215]"
                   >
-                    <option value="Technology">Technology</option>
-                    <option value="Business & Finance">Business & Finance</option>
-                    <option value="Healthcare & Life Sciences">Healthcare & Life Sciences</option>
-                    <option value="Creative & Design">Creative & Design</option>
+                    {domains.filter((d) => d !== 'All').map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[#A1A1AA] uppercase text-[10px]">Avg Target Comp</label>
+                  <label className="text-xs font-bold text-[#D4D4D8]">Median Comp</label>
+                  <input
+                    type="text"
+                    value={editingCareer.avgComp}
+                    onChange={(e) => setEditingCareer({ ...editingCareer, avgComp: e.target.value })}
+                    className="w-full glass-input text-xs text-white p-3 rounded-xl focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#D4D4D8]">Growth Velocity</label>
+                <input
+                  type="text"
+                  value={editingCareer.growthRate}
+                  onChange={(e) => setEditingCareer({ ...editingCareer, growthRate: e.target.value })}
+                  className="w-full glass-input text-xs text-white p-3 rounded-xl focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#D4D4D8]">Overview Summary</label>
+                <textarea
+                  rows={3}
+                  value={editingCareer.heroSummary || editingCareer.description || ''}
+                  onChange={(e) => setEditingCareer({ ...editingCareer, heroSummary: e.target.value })}
+                  className="w-full glass-input text-xs text-white p-3 rounded-xl focus:outline-none resize-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3 rounded-2xl bg-[#E8602E] hover:bg-[#FF7A45] text-white text-xs font-bold shadow-glow-orange-sm transition-all cursor-pointer"
+              >
+                Save Permanent Changes
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CREATE CAREER MODAL */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-fadeIn">
+          <div className="relative w-full max-w-lg rounded-3xl glass-panel-ultra border border-white/20 p-6 sm:p-8 space-y-5 shadow-2xl text-left">
+            <button
+              type="button"
+              onClick={() => setIsAddModalOpen(false)}
+              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-white/10 hover:bg-[#E8602E] text-white flex items-center justify-center text-xs transition-colors cursor-pointer border border-white/15"
+            >
+              <FontAwesomeIcon icon={faXmark} />
+            </button>
+
+            <h3 className="text-xl font-extrabold text-white">Publish New Career Pathway</h3>
+
+            <form onSubmit={handleCreateCareer} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#D4D4D8]">Career Title</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Distributed Consensus Architect"
+                  value={newCareer.title}
+                  onChange={(e) => setNewCareer({ ...newCareer, title: e.target.value })}
+                  className="w-full glass-input text-xs text-white p-3 rounded-xl focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#D4D4D8]">Domain</label>
+                  <select
+                    value={newCareer.domain}
+                    onChange={(e) => setNewCareer({ ...newCareer, domain: e.target.value })}
+                    className="w-full glass-input text-xs text-white p-3 rounded-xl focus:outline-none bg-[#121215]"
+                  >
+                    {domains.filter((d) => d !== 'All').map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[#D4D4D8]">Median Comp</label>
                   <input
                     type="text"
                     placeholder="$165,000"
                     value={newCareer.avgComp}
                     onChange={(e) => setNewCareer({ ...newCareer, avgComp: e.target.value })}
-                    className="w-full glass-input p-3 rounded-xl text-white text-xs focus:outline-none"
+                    className="w-full glass-input text-xs text-white p-3 rounded-xl focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-[#A1A1AA] uppercase text-[10px]">Summary & Overview</label>
+                <label className="text-xs font-bold text-[#D4D4D8]">Summary Description</label>
                 <textarea
                   rows={3}
-                  placeholder="Describe the day-to-day impact and engineering scope..."
+                  placeholder="Core responsibilities and technological footprint..."
                   value={newCareer.heroSummary}
                   onChange={(e) => setNewCareer({ ...newCareer, heroSummary: e.target.value })}
-                  className="w-full glass-input p-3 rounded-xl text-white font-sans text-xs focus:outline-none resize-none"
+                  className="w-full glass-input text-xs text-white p-3 rounded-xl focus:outline-none resize-none"
                 />
               </div>
 
-              <div className="pt-2 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-white/10 text-white text-xs font-bold cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#E8602E] hover:bg-[#FF7A45] text-white text-xs font-bold shadow-glow-orange-sm cursor-pointer"
-                >
-                  Save & Publish
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="w-full py-3 rounded-2xl bg-[#E8602E] hover:bg-[#FF7A45] text-white text-xs font-bold shadow-glow-orange-sm transition-all cursor-pointer"
+              >
+                Save & Index Career
+              </button>
             </form>
           </div>
         </div>

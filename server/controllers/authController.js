@@ -180,10 +180,15 @@ export const getMe = async (req, res, next) => {
 // @access  Private
 export const updateProfile = async (req, res, next) => {
   try {
-    const { name, educationLevel, currentInstitutionOrCompany, majorOrField, skills, interests, bio, experienceYears, targetCareerDomain } = req.body;
+    const { name, avatar, role, educationLevel, currentInstitutionOrCompany, majorOrField, skills, interests, bio, experienceYears, targetCareerDomain } = req.body;
 
-    if (name) {
-      await User.findByIdAndUpdate(req.user.id, { name });
+    const userUpdates = {};
+    if (name) userUpdates.name = name;
+    if (avatar !== undefined) userUpdates.avatar = avatar;
+    if (role) userUpdates.role = role;
+
+    if (Object.keys(userUpdates).length > 0) {
+      await User.findByIdAndUpdate(req.user.id, userUpdates);
     }
 
     const profile = await UserProfile.findOneAndUpdate(
@@ -205,9 +210,48 @@ export const updateProfile = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: 'Profile updated successfully',
+      message: 'Profile updated successfully in MongoDB Atlas',
       user,
       profile,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update user profile & avatar by Email (Public endpoint for live dashboard sync)
+// @route   PUT /api/v1/auth/update-profile
+// @access  Public
+export const updateProfilePublic = async (req, res, next) => {
+  try {
+    const { email, name, avatar, role, targetRole, skills } = req.body;
+    const cleanEmail = (email || '').trim().toLowerCase();
+
+    if (!cleanEmail) {
+      return res.status(400).json({ success: false, message: 'Please provide email' });
+    }
+
+    let user = await User.findOne({ email: cleanEmail });
+    if (user) {
+      if (name) user.name = name;
+      if (avatar !== undefined) user.avatar = avatar;
+      if (role) user.role = role;
+      await user.save();
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile and avatar permanently updated in database',
+      user: user
+        ? {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            avatar: user.avatar,
+            role: user.role,
+            isVerified: user.isVerified,
+          }
+        : null,
     });
   } catch (error) {
     next(error);

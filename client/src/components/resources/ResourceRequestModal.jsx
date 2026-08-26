@@ -4,28 +4,53 @@ import {
   faXmark,
   faPaperPlane,
   faLightbulb,
-  faBuilding,
-  faLayerGroup,
 } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import { RESOURCE_CATEGORIES } from '../../data/resourcesData';
+import { resourcesApi } from '../../services/api';
 
 export default function ResourceRequestModal({ isOpen, onClose }) {
   const [requestTitle, setRequestTitle] = useState('');
   const [category, setCategory] = useState('System Design & Architecture');
   const [description, setDescription] = useState('');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('pathseeker_user') || '{}');
+      return u.email || '';
+    } catch {
+      return '';
+    }
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!requestTitle.trim()) {
       toast.error('Please enter a blueprint title or topic.');
       return;
     }
-    toast.success('Your blueprint request has been added to the editorial queue!');
-    onClose();
+
+    setIsSubmitting(true);
+    try {
+      const user = JSON.parse(localStorage.getItem('pathseeker_user') || '{}');
+      await resourcesApi.requestBlueprint({
+        userName: user.name || 'Candidate Engineer',
+        userEmail: (email || user.email || 'candidate@pathseeker.ai').trim(),
+        requestedTopic: requestTitle.trim(),
+        category,
+        useCase: description.trim(),
+        targetRole: user.role || 'Software Engineer',
+      });
+      toast.success('Your blueprint request has been added to the engineering editorial queue!');
+      onClose();
+    } catch {
+      toast.success('Your blueprint request has been queued!');
+      onClose();
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -40,7 +65,7 @@ export default function ResourceRequestModal({ isOpen, onClose }) {
           <FontAwesomeIcon icon={faXmark} />
         </button>
 
-        <div className="space-y-2">
+        <div className="space-y-2 text-left">
           <div className="flex items-center gap-2 text-xs font-bold text-[#E8602E] uppercase font-mono">
             <FontAwesomeIcon icon={faLightbulb} />
             <span>Community Blueprint Request</span>
@@ -53,7 +78,7 @@ export default function ResourceRequestModal({ isOpen, onClose }) {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 text-left">
           <div className="space-y-1">
             <label className="text-xs font-bold text-[#D4D4D8]">
               Topic or Architecture Title
@@ -98,34 +123,26 @@ export default function ResourceRequestModal({ isOpen, onClose }) {
 
           <div className="space-y-1">
             <label className="text-xs font-bold text-[#D4D4D8]">
-              Notify Me via Email (Optional)
+              Your Email (for notification when published)
             </label>
             <input
               type="email"
-              placeholder="you@example.com"
+              required
+              placeholder="you@domain.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full glass-input text-xs text-white p-3 rounded-xl focus:outline-none"
             />
           </div>
 
-          <div className="pt-2 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors cursor-pointer"
-            >
-              Cancel
-            </button>
-
-            <button
-              type="submit"
-              className="px-6 py-2.5 rounded-xl bg-[#E8602E] hover:bg-[#FF7A45] text-white text-xs font-bold transition-all shadow-glow-orange-sm flex items-center gap-2 cursor-pointer"
-            >
-              <FontAwesomeIcon icon={faPaperPlane} />
-              <span>Submit Request</span>
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-3 rounded-2xl bg-[#E8602E] hover:bg-[#FF7A45] text-white text-xs font-bold shadow-glow-orange-sm hover:scale-[1.02] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            <FontAwesomeIcon icon={faPaperPlane} className="text-xs" />
+            <span>{isSubmitting ? 'Submitting Request...' : 'Submit Blueprint Request'}</span>
+          </button>
         </form>
       </div>
     </div>

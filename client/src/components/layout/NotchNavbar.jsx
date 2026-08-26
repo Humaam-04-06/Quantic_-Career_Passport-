@@ -10,6 +10,7 @@ import {
   faArrowRightFromBracket,
   faUser,
   faCompass,
+  faShieldHalved,
 } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 
@@ -41,10 +42,13 @@ export default function NotchNavbar() {
     { name: 'Resource Library', path: '/resources' },
   ];
 
-  // Only include 'Dashboard' when user is logged in
+  // Include 'Dashboard' and 'Admin Console' when user is logged in
   const navLinks = [
     ...baseNavLinks,
     ...(currentUser ? [{ name: 'Dashboard', path: '/dashboard' }] : []),
+    ...(currentUser && (currentUser.role === 'admin' || currentUser.isAdmin)
+      ? [{ name: 'Admin Console', path: '/admin' }]
+      : []),
   ];
 
   const pillRef = useRef(null);
@@ -67,9 +71,13 @@ export default function NotchNavbar() {
 
     window.addEventListener('storage', checkAuth);
     window.addEventListener('authChange', checkAuth);
+    window.addEventListener('profileChange', checkAuth);
+    window.addEventListener('userUpdate', checkAuth);
     return () => {
       window.removeEventListener('storage', checkAuth);
       window.removeEventListener('authChange', checkAuth);
+      window.removeEventListener('profileChange', checkAuth);
+      window.removeEventListener('userUpdate', checkAuth);
     };
   }, []);
 
@@ -146,12 +154,11 @@ export default function NotchNavbar() {
 
         {/* 1. BRAND LOGO */}
         <Link to="/" className="flex items-center gap-2.5 group flex-shrink-0">
-          {/* Glossy 3D Orange App Icon */}
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#FF7A45] via-[#E8602E] to-[#BC4C22] p-[1px] shadow-[0_2px_10px_rgba(232,96,46,0.5)] flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
-            <div className="w-full h-full bg-gradient-to-b from-[#E8602E] to-[#BC4C22] rounded-[11px] flex items-center justify-center border-t border-white/40">
-              <FontAwesomeIcon icon={faGraduationCap} className="w-4 h-4 text-white drop-shadow" />
-            </div>
-          </div>
+          <img
+            src="/favicon-05.png"
+            alt="PathSeeker Logo"
+            className="w-8 h-8 rounded-xl object-contain drop-shadow-[0_2px_10px_rgba(232,96,46,0.5)] transition-transform duration-300 group-hover:scale-110"
+          />
           <span className="text-base font-extrabold tracking-tight text-white font-sans">
             Path<span className="text-[#E8602E]">Seeker</span>
           </span>
@@ -193,6 +200,17 @@ export default function NotchNavbar() {
         <div className="flex items-center gap-2">
           {currentUser ? (
             <div className="flex items-center gap-2">
+              {(currentUser.role === 'admin' || currentUser.isAdmin) && (
+                <Link
+                  to="/admin"
+                  className="px-2.5 py-1 rounded-full bg-[#E8602E]/20 hover:bg-[#E8602E] text-[#E8602E] hover:text-white border border-[#E8602E]/40 text-[10px] font-mono font-bold uppercase transition-all flex items-center gap-1 shadow-glow-orange-sm cursor-pointer"
+                  title="Open Admin Command Center"
+                >
+                  <FontAwesomeIcon icon={faShieldHalved} className="text-[9px]" />
+                  <span>Admin</span>
+                </Link>
+              )}
+
               <Link
                 to="/dashboard"
                 className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.08] hover:bg-[#E8602E]/20 border border-white/15 text-xs font-bold text-white transition-all shadow-sm group cursor-pointer"
@@ -202,11 +220,12 @@ export default function NotchNavbar() {
                 </span>
                 <img
                   src={
+                    (currentUser.email && localStorage.getItem(`pathseeker_avatar_${currentUser.email.toLowerCase()}`)) ||
                     currentUser.avatar ||
-                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'
+                    'https://api.dicebear.com/7.x/bottts/svg?seed=VoltCyber&backgroundColor=1e1e2f'
                   }
                   alt="Avatar"
-                  className="w-5 h-5 rounded-full object-cover border border-[#E8602E]"
+                  className="w-5 h-5 rounded-full object-cover border border-[#E8602E] bg-slate-800"
                 />
               </Link>
 

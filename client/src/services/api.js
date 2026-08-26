@@ -174,8 +174,20 @@ export const resourcesApi = {
     const res = await api.get('/resources', { params });
     return res.data;
   },
+  getById: async (id) => {
+    const res = await api.get(`/resources/${id}`);
+    return res.data;
+  },
   download: async (id) => {
     const res = await api.post(`/resources/${id}/download`);
+    return res.data;
+  },
+  requestBlueprint: async (data) => {
+    const res = await api.post('/resources/request', data);
+    return res.data;
+  },
+  getTelemetry: async () => {
+    const res = await api.get('/resources/telemetry');
     return res.data;
   },
 };
@@ -189,6 +201,26 @@ export const multimediaApi = {
     const res = await api.get(`/multimedia/${id}`);
     return res.data;
   },
+  recordProgress: async (id, data) => {
+    const res = await api.post(`/multimedia/${id}/progress`, data);
+    return res.data;
+  },
+  postDiscussion: async (id, data) => {
+    const res = await api.post(`/multimedia/${id}/discussion`, data);
+    return res.data;
+  },
+  updateDiscussion: async (id, commentId, data) => {
+    const res = await api.put(`/multimedia/${id}/discussion/${commentId}`, data);
+    return res.data;
+  },
+  deleteDiscussion: async (id, commentId) => {
+    const res = await api.delete(`/multimedia/${id}/discussion/${commentId}`);
+    return res.data;
+  },
+  rate: async (id, scoreData) => {
+    const res = await api.post(`/multimedia/${id}/rate`, scoreData);
+    return res.data;
+  },
 };
 
 // ========================================================
@@ -200,7 +232,117 @@ export const adminApi = {
     return res.data;
   },
   flushCache: async () => {
-    const res = await api.post('/admin/flush-cache');
+    const res = await api.post('/admin/system/flush-cache');
+    return res.data;
+  },
+  // Story moderation
+  getStories: async () => {
+    const res = await api.get('/admin/stories');
+    return res.data;
+  },
+  updateStoryStatus: async (id, status, isFeatured) => {
+    const res = await api.put(`/admin/stories/${id}/status`, { status, isFeatured });
+    return res.data;
+  },
+  deleteStory: async (id) => {
+    const res = await api.delete(`/admin/stories/${id}`);
+    return res.data;
+  },
+  // Media CMS
+  getMedia: async () => {
+    const res = await api.get('/admin/multimedia');
+    return res.data;
+  },
+  createMedia: async (data) => {
+    const res = await api.post('/admin/multimedia', data);
+    return res.data;
+  },
+  updateMedia: async (id, data) => {
+    const res = await api.put(`/admin/multimedia/${id}`, data);
+    return res.data;
+  },
+  deleteMedia: async (id) => {
+    const res = await api.delete(`/admin/multimedia/${id}`);
+    return res.data;
+  },
+  // Resource CMS
+  getResources: async () => {
+    const res = await api.get('/admin/resources');
+    return res.data;
+  },
+  createResource: async (data) => {
+    const res = await api.post('/admin/resources', data);
+    return res.data;
+  },
+  updateResource: async (id, data) => {
+    const res = await api.put(`/admin/resources/${id}`, data);
+    return res.data;
+  },
+  deleteResource: async (id) => {
+    const res = await api.delete(`/admin/resources/${id}`);
+    return res.data;
+  },
+  getBlueprintRequests: async () => {
+    const res = await api.get('/admin/requests');
+    return res.data;
+  },
+  updateBlueprintRequest: async (id, status) => {
+    const res = await api.put(`/admin/requests/${id}`, { status });
+    return res.data;
+  },
+  // Career Bank CRUD
+  getCareers: async () => {
+    const res = await api.get('/admin/careers');
+    return res.data;
+  },
+  createCareer: async (data) => {
+    const res = await api.post('/admin/careers', data);
+    return res.data;
+  },
+  updateCareer: async (id, data) => {
+    const res = await api.put(`/admin/careers/${id}`, data);
+    return res.data;
+  },
+  deleteCareer: async (id) => {
+    const res = await api.delete(`/admin/careers/${id}`);
+    return res.data;
+  },
+  // Quiz Questions CMS
+  getQuizQuestions: async () => {
+    const res = await api.get('/admin/quiz-questions');
+    return res.data;
+  },
+  createQuizQuestion: async (data) => {
+    const res = await api.post('/admin/quiz-questions', data);
+    return res.data;
+  },
+  updateQuizQuestion: async (id, data) => {
+    const res = await api.put(`/admin/quiz-questions/${id}`, data);
+    return res.data;
+  },
+  deleteQuizQuestion: async (id) => {
+    const res = await api.delete(`/admin/quiz-questions/${id}`);
+    return res.data;
+  },
+  // User Management
+  getUsers: async () => {
+    const res = await api.get('/admin/users');
+    return res.data;
+  },
+  updateUserRole: async (id, role) => {
+    const res = await api.put(`/admin/users/${id}/role`, { role });
+    return res.data;
+  },
+  toggleUserVerification: async (id) => {
+    const res = await api.put(`/admin/users/${id}/verify`);
+    return res.data;
+  },
+  toggleUserBlock: async (id) => {
+    const res = await api.put(`/admin/users/${id}/block`);
+    return res.data;
+  },
+  deleteUser: async (id) => {
+    const res = await api.delete(`/admin/users/${id}`);
     return res.data;
   },
 };

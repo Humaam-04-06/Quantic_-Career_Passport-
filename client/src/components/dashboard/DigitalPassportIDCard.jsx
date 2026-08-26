@@ -96,9 +96,11 @@ export default function DigitalPassportIDCard({
         {/* Header: Logo, Passport UID & Cryptographic Chip */}
         <div className="relative z-10 flex items-center justify-between border-b border-white/15 pb-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-[#E8602E] text-white flex items-center justify-center font-black text-xs shadow-glow-orange-sm">
-              QS
-            </div>
+            <img
+              src="/favicon-05.png"
+              alt="PathSeeker Logo"
+              className="w-8 h-8 rounded-xl object-contain shadow-glow-orange-sm"
+            />
             <div>
               <span className="text-xs font-extrabold tracking-wider font-display text-white uppercase block">
                 PATHSEEKER PASSPORT
@@ -160,33 +162,67 @@ export default function DigitalPassportIDCard({
 
         {/* Cognitive RIASEC & Stage Credentials Grid */}
         <div className="relative z-10 grid grid-cols-2 gap-3 p-3.5 rounded-2xl bg-black/60 border border-white/10 text-xs font-mono">
-          <div className="space-y-0.5">
-            <span className="text-[9px] uppercase text-[#71717A] block">Holland Code</span>
-            <span className="text-xs font-extrabold text-[#FFB800] block">
-              {profile.hollandArchetype || 'IRA-94'}
-            </span>
-          </div>
+          {profile.isAdmin || profile.roleStage === 'admin' ? (
+            <>
+              <div className="space-y-0.5">
+                <span className="text-[9px] uppercase text-[#71717A] block">Authority Level</span>
+                <span className="text-xs font-extrabold text-[#FFB800] block">
+                  Tier 5 Super Admin
+                </span>
+              </div>
 
-          <div className="space-y-0.5">
-            <span className="text-[9px] uppercase text-[#71717A] block">Career Stage</span>
-            <span className="text-xs font-extrabold text-[#10B981] block">
-              {profile.roleStage} Track
-            </span>
-          </div>
+              <div className="space-y-0.5">
+                <span className="text-[9px] uppercase text-[#71717A] block">Access Scope</span>
+                <span className="text-xs font-extrabold text-[#10B981] block">
+                  Root Governance
+                </span>
+              </div>
 
-          <div className="space-y-0.5">
-            <span className="text-[9px] uppercase text-[#71717A] block">Issued / Expiry</span>
-            <span className="text-[10px] text-white block">
-              {profile.issueDate || 'August 1, 2026'} - 2029
-            </span>
-          </div>
+              <div className="space-y-0.5">
+                <span className="text-[9px] uppercase text-[#71717A] block">Clearance Status</span>
+                <span className="text-[10px] text-white block">
+                  Permanent Active
+                </span>
+              </div>
 
-          <div className="space-y-0.5">
-            <span className="text-[9px] uppercase text-[#71717A] block">Readiness</span>
-            <span className="text-xs font-extrabold text-[#E8602E] block">
-              {dynamicReadiness}% {readinessLevel}
-            </span>
-          </div>
+              <div className="space-y-0.5">
+                <span className="text-[9px] uppercase text-[#71717A] block">Platform Control</span>
+                <span className="text-xs font-extrabold text-[#E8602E] block">
+                  100% Full Access
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="space-y-0.5">
+                <span className="text-[9px] uppercase text-[#71717A] block">Holland Code</span>
+                <span className="text-xs font-extrabold text-[#FFB800] block">
+                  {profile.hollandArchetype || 'IRA-94'}
+                </span>
+              </div>
+
+              <div className="space-y-0.5">
+                <span className="text-[9px] uppercase text-[#71717A] block">Career Stage</span>
+                <span className="text-xs font-extrabold text-[#10B981] block">
+                  {profile.roleStage} Track
+                </span>
+              </div>
+
+              <div className="space-y-0.5">
+                <span className="text-[9px] uppercase text-[#71717A] block">Issued / Expiry</span>
+                <span className="text-[10px] text-white block">
+                  {profile.issueDate || 'August 1, 2026'} - 2029
+                </span>
+              </div>
+
+              <div className="space-y-0.5">
+                <span className="text-[9px] uppercase text-[#71717A] block">Readiness</span>
+                <span className="text-xs font-extrabold text-[#E8602E] block">
+                  {dynamicReadiness}% {readinessLevel}
+                </span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* QR Code & Cryptographic Verification Footer */}

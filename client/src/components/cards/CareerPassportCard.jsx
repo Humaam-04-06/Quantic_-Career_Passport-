@@ -68,9 +68,11 @@ export default function CareerPassportCard({
       }
       const nextState = !isBookmarked;
       setIsBookmarked(nextState);
-      toast(nextState ? 'Saved to your Career Passport!' : 'Removed from saved', {
-        icon: nextState ? '⭐' : '📌',
-      });
+      if (nextState) {
+        toast.success('Saved to your Career Passport!');
+      } else {
+        toast.success('Removed from saved bookmarks');
+      }
     } catch {
       setIsAuthModalOpen(true);
     }

@@ -7,11 +7,12 @@ import {
   faQuoteLeft,
 } from '@fortawesome/free-solid-svg-icons';
 
-export default function InteractiveTranscript({ transcript, activeSeconds, onSeekTo }) {
+export default function InteractiveTranscript({ transcript = [], activeSeconds = 0, onSeekTo }) {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredTranscript = transcript.filter((line) =>
-    line.text.toLowerCase().includes(searchTerm.toLowerCase())
+  const safeTranscript = Array.isArray(transcript) ? transcript : [];
+  const filteredTranscript = safeTranscript.filter((line) =>
+    (line.text || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (

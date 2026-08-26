@@ -1,16 +1,14 @@
-import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBookOpen,
   faDownload,
-  faLayerGroup,
-  faBrain,
-  faArrowRight,
   faPlus,
-  faShieldHalved,
   faStar,
   faCheckCircle,
+  faLayerGroup,
+  faUsers,
+  faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 import NotchNavbar from '../components/layout/NotchNavbar';
 import Footer from '../components/layout/Footer';
@@ -20,8 +18,17 @@ import FeaturedResourceBanner from '../components/resources/FeaturedResourceBann
 import DocumentViewerModal from '../components/resources/DocumentViewerModal';
 import ResourceRequestModal from '../components/resources/ResourceRequestModal';
 import { RESOURCES_DATABASE } from '../data/resourcesData';
+import { resourcesApi } from '../services/api';
 
 export default function ResourcesPage() {
+  const [resources, setResources] = useState([]);
+  const [telemetry, setTelemetry] = useState({
+    totalResources: 7,
+    totalDownloads: 78160,
+    avgRating: 4.94,
+    totalContributors: 14,
+  });
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All Resources');
   const [selectedFormat, setSelectedFormat] = useState('All Formats');
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,30 +36,62 @@ export default function ResourcesPage() {
   const [activePreviewResource, setActivePreviewResource] = useState(null);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 
+  // Fetch dynamic resources from MongoDB Atlas
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const fetchResources = async () => {
+      try {
+        setIsLoading(true);
+        const [res, telRes] = await Promise.allSettled([
+          resourcesApi.getAll(),
+          resourcesApi.getTelemetry(),
+        ]);
+
+        if (res.status === 'fulfilled' && res.value?.data && res.value.data.length > 0) {
+          setResources(res.value.data);
+        } else {
+          setResources(RESOURCES_DATABASE);
+        }
+
+        if (telRes.status === 'fulfilled' && telRes.value?.data) {
+          setTelemetry(telRes.value.data);
+        }
+      } catch (err) {
+        console.warn('API error, using local database fallback:', err);
+        setResources(RESOURCES_DATABASE);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchResources();
+  }, []);
+
   // Filter & Sort Resources
   const filteredResources = useMemo(() => {
-    let result = RESOURCES_DATABASE.filter((r) => {
+    const list = resources && resources.length > 0 ? resources : RESOURCES_DATABASE;
+    let result = list.filter((r) => {
       const matchesCat =
         selectedCategory === 'All Resources' || r.category === selectedCategory;
       const matchesFmt =
         selectedFormat === 'All Formats' || r.format === selectedFormat;
       const matchesSearch =
-        r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        r.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        r.topics.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+        (r.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (r.summary || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (r.topics || []).some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
       return matchesCat && matchesFmt && matchesSearch;
     });
 
     if (sortBy === 'popular') {
-      result.sort((a, b) => b.downloads - a.downloads);
+      result.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
     } else if (sortBy === 'rating') {
-      result.sort((a, b) => b.rating - a.rating);
+      result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
     } else if (sortBy === 'pages') {
-      result.sort((a, b) => parseInt(b.pages) - parseInt(a.pages));
+      result.sort((a, b) => parseInt(b.pages || '0') - parseInt(a.pages || '0'));
     }
 
     return result;
-  }, [selectedCategory, selectedFormat, searchQuery, sortBy]);
+  }, [resources, selectedCategory, selectedFormat, searchQuery, sortBy]);
 
   const handleResetFilters = () => {
     setSelectedCategory('All Resources');
@@ -61,8 +100,21 @@ export default function ResourcesPage() {
     setSortBy('popular');
   };
 
+  const handleDownloadIncrement = (id) => {
+    setResources((prev) =>
+      prev.map((r) =>
+        r.id === id || r._id === id ? { ...r, downloads: (r.downloads || 0) + 1 } : r
+      )
+    );
+    setTelemetry((prev) => ({
+      ...prev,
+      totalDownloads: prev.totalDownloads + 1,
+    }));
+  };
+
   const featuredResource =
-    RESOURCES_DATABASE.find((r) => r.isFeatured) || RESOURCES_DATABASE[0];
+    (resources.length > 0 && (resources.find((r) => r.isFeatured) || resources[0])) ||
+    RESOURCES_DATABASE[0];
 
   return (
     <div className="min-h-screen bg-[#000000] text-white flex flex-col justify-between overflow-x-hidden selection:bg-[#E8602E]/30 relative">
@@ -107,7 +159,7 @@ export default function ResourcesPage() {
               href="#resources-grid"
               className="px-6 py-3 rounded-2xl bg-white/[0.08] hover:bg-white/20 text-white text-xs sm:text-sm font-bold transition-colors border border-white/15"
             >
-              Explore 180+ Downloads
+              Explore {resources.length || 7} Verified Blueprints
             </a>
           </div>
 
@@ -115,7 +167,7 @@ export default function ResourcesPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8">
             <div className="p-4 rounded-2xl glass-panel-ultra border border-white/10 text-center space-y-1">
               <span className="text-2xl sm:text-3xl font-extrabold text-[#E8602E] font-mono block">
-                180+
+                {telemetry.totalResources}+
               </span>
               <span className="text-[11px] text-[#A1A1AA] uppercase tracking-wider block">
                 Verified Blueprints
@@ -124,7 +176,7 @@ export default function ResourcesPage() {
 
             <div className="p-4 rounded-2xl glass-panel-ultra border border-white/10 text-center space-y-1">
               <span className="text-2xl sm:text-3xl font-extrabold text-[#10B981] font-mono block">
-                45,000+
+                {(telemetry.totalDownloads || 78160).toLocaleString()}+
               </span>
               <span className="text-[11px] text-[#A1A1AA] uppercase tracking-wider block">
                 Total Downloads
@@ -133,45 +185,38 @@ export default function ResourcesPage() {
 
             <div className="p-4 rounded-2xl glass-panel-ultra border border-white/10 text-center space-y-1">
               <span className="text-2xl sm:text-3xl font-extrabold text-[#FFB800] font-mono block">
-                99.4%
+                {telemetry.avgRating || 4.95} / 5.0
               </span>
               <span className="text-[11px] text-[#A1A1AA] uppercase tracking-wider block">
-                Quality Satisfaction
+                Average Community Score
               </span>
             </div>
 
             <div className="p-4 rounded-2xl glass-panel-ultra border border-white/10 text-center space-y-1">
-              <span className="text-2xl sm:text-3xl font-extrabold text-white font-mono block">
+              <span className="text-2xl sm:text-3xl font-extrabold text-[#3B82F6] font-mono block">
                 100% Free
               </span>
               <span className="text-[11px] text-[#A1A1AA] uppercase tracking-wider block">
-                Community Access
+                Open Career Passport
               </span>
             </div>
           </div>
         </section>
 
         {/* ========================================================
-            SECTION 2: FEATURED RESOURCE OF THE WEEK SPOTLIGHT
+            SECTION 2: FEATURED RESOURCE BANNER
             ======================================================== */}
-        <FeaturedResourceBanner
-          resource={featuredResource}
-          onPreview={(res) => setActivePreviewResource(res)}
-        />
+        {featuredResource && (
+          <FeaturedResourceBanner
+            resource={featuredResource}
+            onPreview={(res) => setActivePreviewResource(res)}
+          />
+        )}
 
         {/* ========================================================
-            SECTION 3 & 4: FILTER BAR & RESOURCE CARDS GRID
+            SECTION 3: LIVE FILTER BAR & SEARCH ENGINE
             ======================================================== */}
-        <section id="resources-grid" className="space-y-8 scroll-mt-28">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-              Browse Document & Template Repository
-            </h2>
-            <p className="text-xs text-[#A1A1AA] mt-1">
-              Showing {filteredResources.length} production-ready downloads.
-            </p>
-          </div>
-
+        <section id="resources-grid" className="space-y-8 scroll-mt-24">
           <ResourceFilterBar
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
@@ -184,86 +229,64 @@ export default function ResourcesPage() {
             onReset={handleResetFilters}
           />
 
-          {filteredResources.length === 0 ? (
-            <div className="rounded-3xl glass-panel-ultra p-12 text-center space-y-4">
-              <h3 className="text-lg font-bold text-white">No Resources Found</h3>
-              <p className="text-xs text-[#A1A1AA]">
-                Try adjusting your search keywords or switching category filters.
+          {/* ========================================================
+              SECTION 4: 3-COLUMN RESOURCES CARDS GRID
+              ======================================================== */}
+          {isLoading ? (
+            <div className="py-20 text-center space-y-4">
+              <FontAwesomeIcon icon={faSpinner} className="animate-spin text-3xl text-[#E8602E]" />
+              <p className="text-sm font-mono text-[#A1A1AA]">
+                Synchronizing verified engineering blueprints from MongoDB Atlas...
+              </p>
+            </div>
+          ) : filteredResources.length === 0 ? (
+            <div className="p-12 rounded-3xl glass-panel-ultra border border-white/10 text-center space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-white/5 text-[#A1A1AA] flex items-center justify-center mx-auto text-lg">
+                <FontAwesomeIcon icon={faBookOpen} />
+              </div>
+              <h3 className="text-lg font-bold text-white">No Matching Blueprints Found</h3>
+              <p className="text-xs text-[#A1A1AA] max-w-md mx-auto">
+                No resources matched your search criteria. Try clearing filters or submit a custom blueprint request to our engineering faculty.
               </p>
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="px-4 py-2 rounded-xl bg-[#E8602E] text-white text-xs font-bold cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-[#E8602E] text-white text-xs font-bold shadow-glow-orange-sm cursor-pointer"
               >
-                Reset Filters
+                Reset All Filters
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredResources.map((res) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {filteredResources.map((resource) => (
                 <ResourceCard
-                  key={res.id}
-                  resource={res}
-                  onPreview={(r) => setActivePreviewResource(r)}
+                  key={resource.id || resource._id}
+                  resource={resource}
+                  onPreview={(res) => setActivePreviewResource(res)}
                 />
               ))}
             </div>
           )}
         </section>
-
-        {/* ========================================================
-            SECTION 6: 'MATCH BLUEPRINTS TO YOUR PERSONA' CONDUIT
-            ======================================================== */}
-        <section className="rounded-3xl glass-panel-ultra border border-[#E8602E]/30 p-8 sm:p-12 text-center space-y-6 relative overflow-hidden shadow-glow-orange">
-          <div className="max-w-2xl mx-auto space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-[#E8602E]/20 text-[#E8602E] flex items-center justify-center text-xl mx-auto shadow-glow-orange-sm">
-              <FontAwesomeIcon icon={faBrain} />
-            </div>
-
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-              Not Sure Which Blueprints to Study First?
-            </h2>
-
-            <p className="text-xs sm:text-sm text-[#D4D4D8] leading-relaxed">
-              Take the 7-step Holland RIASEC Cognitive Assessment to receive a curated bundle of blueprints customized for your career path.
-            </p>
-
-            <div className="pt-2 flex items-center justify-center gap-4 flex-wrap">
-              <Link
-                to="/quiz"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-[#E8602E] to-[#BC4C22] text-white font-extrabold text-sm shadow-glow-orange hover:scale-105 transition-transform cursor-pointer"
-              >
-                <span>Take Holland RIASEC Quiz</span>
-                <FontAwesomeIcon icon={faArrowRight} />
-              </Link>
-
-              <Link
-                to="/careers"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white/[0.08] hover:bg-white/20 text-white font-bold text-sm border border-white/15 transition-colors"
-              >
-                <span>Explore Career Bank</span>
-              </Link>
-            </div>
-          </div>
-        </section>
       </main>
 
-      {/* Live Document Preview Reader Modal */}
+      {/* Footer */}
+      <Footer />
+
+      {/* In-Browser Document Viewer Modal */}
       {activePreviewResource && (
         <DocumentViewerModal
           resource={activePreviewResource}
           onClose={() => setActivePreviewResource(null)}
+          onDownloaded={handleDownloadIncrement}
         />
       )}
 
-      {/* Community Request Modal */}
+      {/* Request Custom Blueprint Modal */}
       <ResourceRequestModal
         isOpen={isRequestModalOpen}
         onClose={() => setIsRequestModalOpen(false)}
       />
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 }

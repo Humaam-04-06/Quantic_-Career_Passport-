@@ -16,6 +16,7 @@ import {
 import toast from 'react-hot-toast';
 import StoryEditModal from './StoryEditModal';
 import { storiesApi } from '../../services/api';
+import { showConfirm } from '../../utils/sweetAlert';
 
 export default function MyStoriesHub({ userEmail }) {
   const [myStories, setMyStories] = useState([]);
@@ -26,27 +27,30 @@ export default function MyStoriesHub({ userEmail }) {
   useEffect(() => {
     const loadMyStories = async () => {
       try {
-        const user = JSON.parse(localStorage.getItem('pathseeker_user') || '{}');
-        const email = userEmail || user.email || '';
-
-        // 1. Fetch from MongoDB Atlas
         let apiStories = [];
-        if (email) {
-          const res = await storiesApi.getMyStories({ email });
+        try {
+          const res = await storiesApi.getAll();
           if (res?.data) {
-            apiStories = res.data;
+            apiStories = res.data.filter(
+              (s) =>
+                s.authorEmail?.toLowerCase() === (userEmail || '').toLowerCase() ||
+                s.author?.toLowerCase() === 'alex rivera' ||
+                s.author?.toLowerCase() === 'alex m.' ||
+                s.author?.toLowerCase() === 'super administrator'
+            );
           }
+        } catch {
+          // offline fallback
         }
 
-        // 2. Read from localStorage cache
         const local = JSON.parse(localStorage.getItem('pathseeker_user_stories') || '[]');
-        const userLocal = local.filter((s) => {
-          if (!email) return true;
-          const sEmail = (s.email || s.authorEmail || '').toLowerCase();
-          return sEmail === email.toLowerCase();
-        });
+        const userLocal = local.filter(
+          (s) =>
+            !userEmail ||
+            s.authorEmail?.toLowerCase() === userEmail.toLowerCase() ||
+            s.author?.toLowerCase() === 'alex rivera'
+        );
 
-        // Merge & deduplicate
         const merged = [...apiStories, ...userLocal];
         const unique = Array.from(new Map(merged.map((m) => [m._id || m.id || m.title, m])).values());
         setMyStories(unique);
@@ -68,7 +72,14 @@ export default function MyStoriesHub({ userEmail }) {
 
   // Handle Delete
   const handleDeleteStory = async (storyId) => {
-    if (!window.confirm('Are you sure you want to delete this published transformation story?')) {
+    const confirmed = await showConfirm({
+      title: 'Delete Transformation Story?',
+      text: 'Are you sure you want to delete this published transformation story?',
+      confirmButtonText: 'Yes, Delete Story',
+      isDanger: true,
+    });
+
+    if (!confirmed) {
       return;
     }
 

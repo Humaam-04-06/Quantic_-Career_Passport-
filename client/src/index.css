@@ -1201,4 +1201,104 @@
   transform: rotateX(90deg) translateZ(calc(var(--cube-size) / 2));
 }
 
+/* ========================================================
+   SWEETALERT2 LUXURY CYBER GLASS THEME
+   ======================================================== */
+.cyber-swal-popup {
+  background: rgba(10, 10, 14, 0.95) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 35px rgba(232, 96, 46, 0.25) !important;
+  padding: 2rem !important;
+  color: #FFFFFF !important;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+}
+
+.cyber-swal-title {
+  color: #FFFFFF !important;
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.cyber-swal-html {
+  color: #A1A1AA !important;
+  font-size: 0.875rem !important;
+  line-height: 1.5 !important;
+}
+
+.cyber-swal-confirm-btn {
+  background: #E8602E !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  font-size: 0.8125rem !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 14px !important;
+  margin: 0.35rem !important;
+  box-shadow: 0 4px 15px rgba(232, 96, 46, 0.4) !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  border: none !important;
+}
+
+.cyber-swal-confirm-btn:hover {
+  background: #FF7A45 !important;
+  transform: scale(1.03) !important;
+}
+
+.cyber-swal-danger-btn {
+  background: #EF4444 !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  font-size: 0.8125rem !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 14px !important;
+  margin: 0.35rem !important;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4) !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  border: none !important;
+}
+
+.cyber-swal-danger-btn:hover {
+  background: #DC2626 !important;
+  transform: scale(1.03) !important;
+}
+
+.cyber-swal-cancel-btn {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #D4D4D8 !important;
+  font-weight: 600 !important;
+  font-size: 0.8125rem !important;
+  padding: 0.75rem 1.35rem !important;
+  border-radius: 14px !important;
+  margin: 0.35rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.cyber-swal-cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #FFFFFF !important;
+}
+
+.cyber-swal-input {
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 14px !important;
+  font-size: 0.875rem !important;
+  padding: 0.75rem 1rem !important;
+}
+
+.cyber-swal-input:focus {
+  border-color: #E8602E !important;
+  box-shadow: 0 0 10px rgba(232, 96, 46, 0.4) !important;
+}
+
+
 

@@ -211,8 +211,11 @@ export default function CoverFlowStoriesSlider({ stories = [], onSelectStory }) 
         <div className="space-y-3 flex-1">
           <div className="flex items-center gap-3 flex-wrap">
             <span className="text-xs font-bold text-white">{activeStory.name}</span>
-            <span className="text-xs text-[#A1A1AA]">
-              Transitioned from <strong className="text-white">{activeStory.previousRole}</strong> ➔ <strong className="text-[#E8602E]">{activeStory.currentRole} at {activeStory.currentCompany}</strong>
+            <span className="text-xs text-[#A1A1AA] flex items-center gap-1.5 flex-wrap">
+              <span>Transitioned from</span>
+              <strong className="text-white">{activeStory.previousRole}</strong>
+              <FontAwesomeIcon icon={faArrowRight} className="text-[#E8602E] text-[10px]" />
+              <strong className="text-[#E8602E]">{activeStory.currentRole} at {activeStory.currentCompany}</strong>
             </span>
           </div>
 

@@ -91,7 +91,7 @@ export default function StoryEditModal({ isOpen, onClose, story, onStoryUpdated 
         // ignore
       }
 
-      toast.success('🎉 Transformation story updated successfully!');
+      toast.success('Transformation story updated successfully!');
       onStoryUpdated?.({ ...story, ...updatedData });
       onClose();
     } catch (err) {

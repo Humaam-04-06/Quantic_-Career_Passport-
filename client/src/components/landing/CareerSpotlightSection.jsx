@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -11,12 +11,13 @@ import {
   faLayerGroup,
   faSearch,
 } from '@fortawesome/free-solid-svg-icons';
+import { adminApi } from '../../services/api';
 
 const DOMAINS = ['All', 'Technology', 'Healthcare', 'Engineering', 'Business & Finance', 'Creative & Design'];
 
 const SPOTLIGHT_CAREERS = [
   {
-    id: '1',
+    id: 'ai-ml-engineer',
     title: 'AI & Machine Learning Engineer',
     domain: 'Technology',
     description: 'Design and deploy deep learning architectures, LLM fine-tuning pipelines, and neural networks powering real-time inference.',
@@ -29,7 +30,7 @@ const SPOTLIGHT_CAREERS = [
     thumbnail: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=800&q=80',
   },
   {
-    id: '2',
+    id: 'full-stack-engineer',
     title: 'Full-Stack Cloud Architect',
     domain: 'Technology',
     description: 'Architect distributed multi-tier microservices, modern React/Node interfaces, and resilient cloud infrastructures.',
@@ -42,7 +43,7 @@ const SPOTLIGHT_CAREERS = [
     thumbnail: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=800&q=80',
   },
   {
-    id: '3',
+    id: 'biomedical-data-scientist',
     title: 'Biomedical Data Scientist',
     domain: 'Healthcare',
     description: 'Analyze clinical genomics, digital health records, and biological datasets to engineer diagnostic biomarker algorithms.',
@@ -55,20 +56,20 @@ const SPOTLIGHT_CAREERS = [
     thumbnail: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=800&q=80',
   },
   {
-    id: '4',
+    id: 'quant-trader',
     title: 'Quantitative Portfolio Analyst',
     domain: 'Business & Finance',
-    description: 'Formulate algorithmic trading strategies, stochastic risk matrices, and automated execution systems for asset management.',
+    description: 'Develop statistical arbitrage algorithms, risk-adjusted forecasting models, and stochastic simulations.',
     entrySalary: '$95,000',
-    seniorSalary: '$240,000',
-    growthRate: '+19% Growth',
+    seniorSalary: '$225,000',
+    growthRate: '+20% Growth',
     demand: 'High',
     skills: ['Stochastic Math', 'Python/C++', 'Time Series', 'Risk Analytics'],
     isTrending: false,
     thumbnail: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80',
   },
   {
-    id: '5',
+    id: 'ui-ux-designer',
     title: 'Principal UI/UX & Product Designer',
     domain: 'Creative & Design',
     description: 'Design tokenized multi-platform design systems, high-fidelity prototypes, and user journey architectures.',
@@ -81,7 +82,7 @@ const SPOTLIGHT_CAREERS = [
     thumbnail: 'https://images.unsplash.com/photo-1581291518655-9523c93269c4?auto=format&fit=crop&w=800&q=80',
   },
   {
-    id: '6',
+    id: 'robotics-engineer',
     title: 'Robotics & Autonomous Systems Lead',
     domain: 'Engineering',
     description: 'Program embedded microcontrollers, sensor fusion algorithms, and kinematic actuators for industrial autonomous robotics.',
@@ -98,12 +99,40 @@ const SPOTLIGHT_CAREERS = [
 export default function CareerSpotlightSection() {
   const [selectedDomain, setSelectedDomain] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [careersList, setCareersList] = useState(SPOTLIGHT_CAREERS);
 
-  const filteredCareers = SPOTLIGHT_CAREERS.filter((career) => {
+  useEffect(() => {
+    const fetchLiveCareers = async () => {
+      try {
+        const res = await adminApi.getCareers();
+        if (res?.data && res.data.length > 0) {
+          const formatted = res.data.map((c) => ({
+            id: c.id || c._id,
+            title: c.title,
+            domain: c.domain,
+            description: c.heroSummary || c.description || 'Verified career pathway with comprehensive skill progression.',
+            entrySalary: c.salaryLadder?.entry || '$90,000',
+            seniorSalary: c.salaryLadder?.senior || c.avgComp || '$180,000',
+            growthRate: c.growthRate || '+25% YoY',
+            demand: c.jobDemand || 'High',
+            skills: c.skills?.hard || ['Python', 'System Design', 'Cloud'],
+            isTrending: !!c.isTrending,
+            thumbnail: c.thumbnail || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80',
+          }));
+          setCareersList(formatted);
+        }
+      } catch {
+        // use fallback
+      }
+    };
+    fetchLiveCareers();
+  }, []);
+
+  const filteredCareers = careersList.filter((career) => {
     const matchesDomain = selectedDomain === 'All' || career.domain === selectedDomain;
     const matchesSearch =
-      career.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      career.skills.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()));
+      (career.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (career.skills || []).some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesDomain && matchesSearch;
   });
 
@@ -173,14 +202,14 @@ export default function CareerSpotlightSection() {
           </div>
         </div>
 
-        {/* Career Spotlight Cards Grid with Content-Related Background Image & Ultra-Glass Sheen */}
+        {/* Career Spotlight Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
           {filteredCareers.map((career) => (
             <div
               key={career.id}
               className="group relative p-7 rounded-[2.5rem] glass-card-interactive flex flex-col justify-between overflow-hidden shadow-glass hover:border-white/30 transition-all duration-300"
             >
-              {/* Content-Related Background Image with High Visibility & Smooth Hover Zoom */}
+              {/* Content-Related Background Image */}
               <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
                 <img
                   src={career.thumbnail}
@@ -190,7 +219,7 @@ export default function CareerSpotlightSection() {
                   }}
                   className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-105 transition-all duration-700 ease-out brightness-90 contrast-110"
                 />
-                {/* Balanced Dark Frosted Gradient Mask for Perfect Text Readability */}
+                {/* Balanced Dark Frosted Gradient Mask */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#08080C] via-[#08080C]/75 to-[#08080C]/35" />
                 <div className="absolute inset-0 bg-black/25" />
                 {/* Ambient Refraction Glow */}
@@ -224,7 +253,7 @@ export default function CareerSpotlightSection() {
 
                 {/* Required Skills Tags */}
                 <div className="flex flex-wrap gap-1.5 mb-6">
-                  {career.skills.map((skill, idx) => (
+                  {(career.skills || []).map((skill, idx) => (
                     <span
                       key={idx}
                       className="px-2.5 py-1 rounded-xl text-[10px] font-semibold bg-black/50 text-[#E4E4E7] border border-white/15 backdrop-blur-md shadow-sm"

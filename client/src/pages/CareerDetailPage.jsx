@@ -45,7 +45,7 @@ export default function CareerDetailPage() {
     if (!isBookmarked) {
       toast.success('Pathway saved to your Career Passport bookmarks!');
     } else {
-      toast('Removed from saved bookmarks', { icon: '📌' });
+      toast.success('Removed from saved bookmarks');
     }
   };
 

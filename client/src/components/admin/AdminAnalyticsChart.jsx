@@ -1,16 +1,21 @@
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faChartColumn,
-  faChartArea,
-  faCompass,
-  faFire,
-} from '@fortawesome/free-solid-svg-icons';
+import React, { useState } from 'react';
 import { DOMAIN_DISTRIBUTION, WEEKLY_VELOCITY } from '../../data/adminData';
 
-export default function AdminAnalyticsChart() {
+export default function AdminAnalyticsChart({ stats }) {
+  const domainData = stats?.domainDistribution || DOMAIN_DISTRIBUTION;
+  const velocityData = stats?.weeklyVelocity || WEEKLY_VELOCITY;
+  const peakDayText = stats?.peakDay ? `${stats.peakDay.day || stats.peakDay} (${stats.peakDay.total ? `${stats.peakDay.total} Events` : stats.peakDay})` : 'Sunday (15 Events)';
+
+  const [hoveredDay, setHoveredDay] = useState(null);
+
+  // Dynamically calculate the maximum value across all days for perfect proportional scaling
+  const maxMetricValue = Math.max(
+    ...velocityData.map((d) => Math.max(d.quizzes || 0, d.passports || 0, 1)),
+    1
+  );
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
       {/* 1. Domain Popularity Distribution (7 Cols) */}
       <div className="lg:col-span-7 rounded-3xl glass-panel-ultra border border-white/15 p-6 sm:p-8 space-y-6 shadow-2xl">
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
@@ -22,12 +27,15 @@ export default function AdminAnalyticsChart() {
               Candidate Domain Distribution
             </h3>
           </div>
-          <span className="text-xs font-mono text-[#A1A1AA]">Live Real-Time</span>
+          <span className="text-xs font-mono text-[#10B981] flex items-center gap-1.5 font-bold">
+            <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
+            Live Real-Time
+          </span>
         </div>
 
         <div className="space-y-4">
-          {DOMAIN_DISTRIBUTION.map((item, i) => (
-            <div key={i} className="space-y-2 p-3.5 rounded-2xl bg-white/[0.02] border border-white/10">
+          {domainData.map((item, i) => (
+            <div key={i} className="space-y-2 p-3.5 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-white/20 transition-all">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-white">{item.domain}</span>
                 <div className="flex items-center gap-2 font-mono">
@@ -41,7 +49,7 @@ export default function AdminAnalyticsChart() {
               {/* Progress bar */}
               <div className="w-full h-2.5 bg-white/[0.08] rounded-full overflow-hidden">
                 <div
-                  className="h-full rounded-full transition-all duration-700"
+                  className="h-full rounded-full transition-all duration-700 shadow-sm"
                   style={{
                     width: `${item.percent}%`,
                     backgroundColor: item.color,
@@ -65,47 +73,72 @@ export default function AdminAnalyticsChart() {
                 Tests vs Passports
               </h3>
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-mono">
-              <span className="flex items-center gap-1 text-[#E8602E]">
-                <span className="w-2 h-2 rounded-full bg-[#E8602E]" />
-                Quiz
+            <div className="flex items-center gap-3 text-[10px] font-mono">
+              <span className="flex items-center gap-1.5 text-[#E8602E]">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#E8602E] shadow-glow-orange-sm" />
+                Quiz Tests
               </span>
-              <span className="flex items-center gap-1 text-[#10B981]">
-                <span className="w-2 h-2 rounded-full bg-[#10B981]" />
-                Passport
+              <span className="flex items-center gap-1.5 text-[#10B981]">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" />
+                Passports
               </span>
             </div>
           </div>
 
-          {/* Simple Visual Bar Chart */}
-          <div className="grid grid-cols-7 gap-2 items-end h-48 pt-6 pb-2">
-            {WEEKLY_VELOCITY.map((day, i) => (
-              <div key={i} className="flex flex-col items-center gap-2 h-full justify-end">
-                <div className="w-full flex items-end justify-center gap-1 h-36">
-                  {/* Quiz Bar */}
-                  <div
-                    className="w-2.5 bg-[#E8602E] rounded-t-sm transition-all duration-500 shadow-glow-orange-sm"
-                    style={{ height: `${(day.quizzes / 800) * 100}%` }}
-                    title={`${day.day}: ${day.quizzes} Quizzes`}
-                  />
-                  {/* Passport Bar */}
-                  <div
-                    className="w-2.5 bg-[#10B981] rounded-t-sm transition-all duration-500"
-                    style={{ height: `${(day.passports / 800) * 100}%` }}
-                    title={`${day.day}: ${day.passports} Passports`}
-                  />
+          {/* Active Hover Detail Popup */}
+          <div className="h-6 flex items-center justify-center">
+            {hoveredDay ? (
+              <span className="text-xs font-mono text-[#FFE8DE] bg-[#E8602E]/20 px-3 py-0.5 rounded-full border border-[#E8602E]/40 animate-fadeIn">
+                <strong>{hoveredDay.day}:</strong> {hoveredDay.quizzes} Quizzes • {hoveredDay.passports} Passports ({hoveredDay.quizzes + hoveredDay.passports} Total)
+              </span>
+            ) : (
+              <span className="text-[10px] font-mono text-[#71717A]">
+                Hover over bars to view daily event metrics
+              </span>
+            )}
+          </div>
+
+          {/* Dynamic Scaling Visual Bar Chart */}
+          <div className="grid grid-cols-7 gap-2 items-end h-44 pt-4 pb-2">
+            {velocityData.map((day, i) => {
+              const quizPercent = Math.max(10, Math.round(((day.quizzes || 0) / maxMetricValue) * 88));
+              const passportPercent = Math.max(10, Math.round(((day.passports || 0) / maxMetricValue) * 88));
+
+              return (
+                <div
+                  key={i}
+                  onMouseEnter={() => setHoveredDay(day)}
+                  onMouseLeave={() => setHoveredDay(null)}
+                  className="flex flex-col items-center gap-2 h-full justify-end group cursor-pointer"
+                >
+                  <div className="w-full flex items-end justify-center gap-1.5 h-32 p-1 rounded-xl group-hover:bg-white/[0.04] transition-colors">
+                    {/* Quiz Bar */}
+                    <div
+                      className="w-3 bg-[#E8602E] rounded-t-md transition-all duration-500 shadow-glow-orange-sm group-hover:brightness-125"
+                      style={{ height: `${quizPercent}%` }}
+                      title={`${day.day}: ${day.quizzes} Quizzes`}
+                    />
+                    {/* Passport Bar */}
+                    <div
+                      className="w-3 bg-[#10B981] rounded-t-md transition-all duration-500 group-hover:brightness-125"
+                      style={{ height: `${passportPercent}%` }}
+                      title={`${day.day}: ${day.passports} Passports`}
+                    />
+                  </div>
+                  <span className={`text-[10px] font-mono uppercase font-bold transition-colors ${
+                    hoveredDay?.day === day.day ? 'text-[#E8602E]' : 'text-[#71717A]'
+                  }`}>
+                    {day.day}
+                  </span>
                 </div>
-                <span className="text-[10px] font-mono text-[#71717A] uppercase font-bold">
-                  {day.day}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         <div className="p-4 rounded-2xl bg-black/50 border border-white/10 flex items-center justify-between text-xs font-mono">
           <span className="text-[#A1A1AA]">Peak Ingestion Day:</span>
-          <span className="text-[#FFE8DE] font-bold">Sunday (1,170 Events)</span>
+          <span className="text-[#FFE8DE] font-bold">{peakDayText}</span>
         </div>
       </div>
     </div>

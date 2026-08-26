@@ -36,11 +36,11 @@ export default function Footer() {
           {/* Col 1 & 2: Brand & Newsletter */}
           <div className="lg:col-span-2 space-y-4">
             <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-[#FF7A45] via-[#E8602E] to-[#BC4C22] p-[1px] shadow-[0_2px_10px_rgba(232,96,46,0.5)] flex items-center justify-center">
-                <div className="w-full h-full bg-[#121215] rounded-[11px] flex items-center justify-center border-t border-white/30">
-                  <FontAwesomeIcon icon={faGraduationCap} className="text-[#E8602E] text-sm" />
-                </div>
-              </div>
+              <img
+                src="/favicon-05.png"
+                alt="PathSeeker Logo"
+                className="w-8 h-8 rounded-xl object-contain drop-shadow-[0_2px_10px_rgba(232,96,46,0.5)]"
+              />
               <span className="text-xl font-extrabold font-display tracking-tight text-white">
                 Path<span className="text-[#E8602E]">Seeker</span>
               </span>

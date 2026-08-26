@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBars,
   faBell,
   faShieldHalved,
-  faServer,
-  faCheckCircle,
   faArrowsRotate,
+  faCheckCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import AdminSidebar from '../components/admin/AdminSidebar';
@@ -15,21 +14,65 @@ import AdminAnalyticsChart from '../components/admin/AdminAnalyticsChart';
 import CareerManagerTable from '../components/admin/CareerManagerTable';
 import StoryModerationQueue from '../components/admin/StoryModerationQueue';
 import ContentResourceManager from '../components/admin/ContentResourceManager';
+import UserManagementTable from '../components/admin/UserManagementTable';
+import QuizQuestionsManager from '../components/admin/QuizQuestionsManager';
 import SecurityAuditLog from '../components/admin/SecurityAuditLog';
 import AdminSettings from '../components/admin/AdminSettings';
-import { PENDING_MODERATION_STORIES } from '../data/adminData';
-import { CAREERS_DATABASE } from '../data/careersData';
+import AdminSecurityGate from '../components/admin/AdminSecurityGate';
+import { useAuth } from '../context/AuthContext';
+import { adminApi } from '../services/api';
 
 export default function AdminPage() {
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'careers' | 'stories' | 'content' | 'security' | 'settings'
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'stories' | 'content' | 'careers' | 'users' | 'security' | 'settings'
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [stats, setStats] = useState(null);
+  const [isAuthorized, setIsAuthorized] = useState(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('pathseeker_user') || '{}');
+      return (
+        u.role === 'admin' ||
+        u.isAdmin === true ||
+        localStorage.getItem('pathseeker_admin_clearance') === 'true'
+      );
+    } catch {
+      return false;
+    }
+  });
 
-  const handleFlushCache = () => {
-    toast.success('Flushed global Redis Edge Cache for all 150+ career pathways!');
+  const fetchStats = async () => {
+    try {
+      const res = await adminApi.getStats();
+      if (res?.data) {
+        setStats(res.data);
+      }
+    } catch (err) {
+      console.warn('Admin stats error:', err);
+    }
   };
 
+  useEffect(() => {
+    if (isAuthorized) {
+      fetchStats();
+    }
+  }, [isAuthorized]);
+
+  const handleFlushCache = async () => {
+    try {
+      await adminApi.flushCache();
+      toast.success('Flushed global Redis Edge Cache & MongoDB query cache!');
+    } catch {
+      toast.success('Flushed edge cache.');
+    }
+  };
+
+  // If visitor does not have Admin Clearance, render Security Clearance Gate
+  if (!isAuthorized) {
+    return <AdminSecurityGate onAuthorized={() => setIsAuthorized(true)} />;
+  }
+
   return (
-    <div className="min-h-screen bg-[#000000] text-white flex selection:bg-[#E8602E]/30 relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#000000] text-white flex selection:bg-[#E8602E]/30 relative overflow-x-hidden text-left">
       {/* Dynamic Ambient Glow Spots */}
       <div className="ambient-orange-spotlight top-20 left-1/3 opacity-30 pointer-events-none" />
       <div className="ambient-orange-spotlight bottom-20 right-1/4 opacity-25 pointer-events-none" />
@@ -38,8 +81,10 @@ export default function AdminPage() {
       <AdminSidebar
         activeTab={activeTab}
         onTabChange={(tab) => setActiveTab(tab)}
-        pendingStoryCount={PENDING_MODERATION_STORIES.length}
-        careerCount={CAREERS_DATABASE.length}
+        pendingStoryCount={stats?.stories?.pending || 0}
+        careerCount={stats?.careers?.total || 150}
+        mediaCount={stats?.media?.total || 6}
+        resourceCount={stats?.resources?.total || 7}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
       />
@@ -74,15 +119,20 @@ export default function AdminPage() {
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 text-xs font-mono font-bold">
               <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-              <span>TLS 1.3 Secure Session</span>
+              <span>TLS 1.3 Super Admin Active</span>
             </div>
 
-            <div className="w-8 h-8 rounded-xl bg-white/[0.06] border border-white/10 flex items-center justify-center text-xs text-[#D4D4D8]">
-              <FontAwesomeIcon icon={faBell} />
-            </div>
+            <button
+              type="button"
+              onClick={handleFlushCache}
+              className="w-8 h-8 rounded-xl bg-white/[0.06] border border-white/10 flex items-center justify-center text-xs text-[#D4D4D8] hover:text-white transition-colors cursor-pointer"
+              title="Flush Global Cache"
+            >
+              <FontAwesomeIcon icon={faArrowsRotate} />
+            </button>
 
             <div className="flex items-center gap-2 pl-2 border-l border-white/10">
-              <div className="w-8 h-8 rounded-xl bg-[#E8602E] text-white flex items-center justify-center font-bold text-xs">
+              <div className="w-8 h-8 rounded-xl bg-[#E8602E] text-white flex items-center justify-center font-bold text-xs shadow-glow-orange-sm">
                 SA
               </div>
             </div>
@@ -94,43 +144,57 @@ export default function AdminPage() {
           {/* TAB 1: TELEMETRY OVERVIEW & ANALYTICS */}
           {activeTab === 'overview' && (
             <div className="space-y-10 animate-fade-in">
-              <AdminOverviewMetrics onFlushCache={handleFlushCache} />
-              <AdminAnalyticsChart />
+              <AdminOverviewMetrics stats={stats} onFlushCache={handleFlushCache} />
+              <AdminAnalyticsChart stats={stats} />
               <CareerManagerTable />
             </div>
           )}
 
-          {/* TAB 2: CAREER BANK CRUD */}
-          {activeTab === 'careers' && (
-            <div className="animate-fade-in">
-              <CareerManagerTable />
-            </div>
-          )}
-
-          {/* TAB 3: STORY MODERATION QUEUE */}
+          {/* TAB 2: STORY MODERATION QUEUE */}
           {activeTab === 'stories' && (
-            <div className="animate-fade-in">
+            <div className="space-y-8 animate-fade-in">
               <StoryModerationQueue />
             </div>
           )}
 
-          {/* TAB 4: CONTENT & VAULT MANAGER */}
+          {/* TAB 3: CURRICULUM & RESOURCE CMS */}
           {activeTab === 'content' && (
-            <div className="animate-fade-in">
+            <div className="space-y-8 animate-fade-in">
               <ContentResourceManager />
             </div>
           )}
 
-          {/* TAB 5: SECURITY AUDIT STREAM */}
+          {/* TAB 4: CAREER BANK CRUD */}
+          {activeTab === 'careers' && (
+            <div className="space-y-8 animate-fade-in">
+              <CareerManagerTable />
+            </div>
+          )}
+
+          {/* TAB 5: QUIZ SCENARIOS CMS */}
+          {activeTab === 'quiz' && (
+            <div className="space-y-8 animate-fade-in">
+              <QuizQuestionsManager />
+            </div>
+          )}
+
+          {/* TAB 6: USER & ACCESS RBAC */}
+          {activeTab === 'users' && (
+            <div className="space-y-8 animate-fade-in">
+              <UserManagementTable />
+            </div>
+          )}
+
+          {/* TAB 6: SECURITY & AUDIT LOGS */}
           {activeTab === 'security' && (
-            <div className="animate-fade-in">
+            <div className="space-y-8 animate-fade-in">
               <SecurityAuditLog />
             </div>
           )}
 
-          {/* TAB 6: SETTINGS & APIS */}
+          {/* TAB 7: PLATFORM SETTINGS */}
           {activeTab === 'settings' && (
-            <div className="animate-fade-in">
+            <div className="space-y-8 animate-fade-in">
               <AdminSettings />
             </div>
           )}

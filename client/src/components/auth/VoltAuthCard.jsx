@@ -57,13 +57,13 @@ const DEMO_ACCOUNTS = {
     isVerified: true,
   },
   'admin@pathseeker.ai': {
-    name: 'Admin Supervisor',
+    name: 'Super Administrator',
     email: 'admin@pathseeker.ai',
-    password: 'password123',
+    password: 'Admin@12345',
     role: 'admin',
     targetRole: 'Platform Administrator',
     targetCompany: 'PathSeeker Core',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
     skills: ['Platform Governance', 'Audit', 'System Architecture'],
     isVerified: true,
   },
@@ -324,8 +324,10 @@ export default function VoltAuthCard({ initialMode = 'login' }) {
 
       const data = await res.json();
       if (res.ok && data.success) {
+        const savedCustomAvatar = localStorage.getItem(`pathseeker_avatar_${userEmail}`);
         authenticatedUser = {
           ...data.user,
+          avatar: savedCustomAvatar || (data.user.avatar && data.user.avatar.trim() ? data.user.avatar : DEFAULT_AVATAR),
           token: data.token,
           password: loginPassword,
         };
@@ -385,8 +387,10 @@ export default function VoltAuthCard({ initialMode = 'login' }) {
         return;
       }
 
+      const savedCustomAvatar = localStorage.getItem(`pathseeker_avatar_${userEmail}`);
       authenticatedUser = {
         ...existingAccount,
+        avatar: savedCustomAvatar || existingAccount.avatar || DEFAULT_AVATAR,
         password: loginPassword,
         token: 'jwt-auth-token-' + Date.now(),
       };
@@ -409,11 +413,17 @@ export default function VoltAuthCard({ initialMode = 'login' }) {
     say('Access Granted! Welcome to PathSeeker Career Passport.');
     localStorage.setItem('pathseeker_user', JSON.stringify(authenticatedUser));
     window.dispatchEvent(new Event('authChange'));
+    window.dispatchEvent(new Event('userUpdate'));
+    window.dispatchEvent(new Event('profileChange'));
 
     toast.success(`Welcome back, ${authenticatedUser.name}!`);
 
     setTimeout(() => {
-      navigate('/dashboard');
+      if (authenticatedUser.role === 'admin' || authenticatedUser.isAdmin) {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     }, 1000);
   };
 

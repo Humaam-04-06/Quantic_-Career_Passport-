@@ -74,7 +74,7 @@ export default function SavedCareersHub() {
     } catch {
       // ignore
     }
-    toast('Removed from saved bookmarks', { icon: '📌' });
+    toast.success('Removed from saved bookmarks');
 
     // Sync with backend API
     try {

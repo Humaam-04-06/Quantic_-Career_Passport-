@@ -23,12 +23,16 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['student', 'graduate', 'professional', 'admin'],
+    enum: ['student', 'graduate', 'professional', 'mentor', 'admin'],
     default: 'student',
   },
   avatar: {
     type: String,
     default: '',
+  },
+  isBlocked: {
+    type: Boolean,
+    default: false,
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
