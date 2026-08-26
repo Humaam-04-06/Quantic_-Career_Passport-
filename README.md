@@ -1,354 +1,186 @@
 # 🎓 PathSeeker — Career Passport Platform
-> **Empowering Students, Graduates, and Working Professionals to Discover What Fits Them Best.**
+> **Empowering Students, Graduates, and Working Professionals to Discover What Fits Them Best.**  
+> *Built for TechWiz 6 — Global AI-Driven Web Application Competition*
 
 [![TechWiz 6](https://img.shields.io/badge/Competition-TechWiz%206-blue?style=for-the-badge&logo=codeforces)](https://www.aptech-worldwide.com)
-[![Category](https://img.shields.io/badge/Category-Full--Stack%20Web%20Application-orange?style=for-the-badge)](https://github.com)
-[![Theme](https://img.shields.io/badge/Theme-Career%20Passport-green?style=for-the-badge)](https://github.com)
-[![Stack](https://img.shields.io/badge/Stack-MERN%20%2B%20Tailwind%20CSS-blueviolet?style=for-the-badge&logo=react)](https://react.dev)
+[![Status](https://img.shields.io/badge/Project%20Status-60%25%20Completed-success?style=for-the-badge)](https://github.com)
+[![Theme](https://img.shields.io/badge/Theme-Ultra--Glassmorphism%20%26%20Pitch%20Black-orange?style=for-the-badge)](https://github.com)
+[![Stack](https://img.shields.io/badge/Stack-React%2018%20%2B%20Tailwind%20%2B%20GSAP%20%2B%20Three.js-blueviolet?style=for-the-badge&logo=react)](https://react.dev)
 
 ---
 
-## 📌 1. Project Overview & Background
-
-### 1.1 The Problem
-In today's fast-evolving job market, **students, graduates, and professionals** struggle to navigate career options that align with their distinct skills, passions, and educational backgrounds. Most existing platforms provide generic information, lack structured progression paths, and do not offer personalized role-specific guidance.
-
-### 1.2 The Solution: PathSeeker
-**PathSeeker** is a responsive, interactive, and personalized **Career Passport Web Application**. Built for the **TechWiz 6 Global AI-based Tech Competition**, PathSeeker bridges the gap in accessible career mentorship through:
-- **Role-Based Segmentation:** Tailored experiences for Students, Graduates, and Working Professionals.
-- **Smart Career Bank:** Search and multi-level filtering by domain, salary, skills, and industry demand.
-- **AI-Powered / Interactive Interest Quiz:** Timed questions, Likert scales, and dynamic career path suggestions.
-- **Interactive Multimedia Center:** Video explainers, audio podcasts, transcripts, and community feedback.
-- **Success Stories Hub:** Visual timeline storytelling (Education → Challenges → Outcome).
-- **Document Resource Library:** Downloadable guides, PDF auto-previews, and popularity tracking.
-- **Bookmarking & Notes Engine:** Save careers, attach notes, and export summaries to PDF.
-- **Admin Control Panel & Analytics:** Complete content management, moderation, and usage telemetry.
-- **Interactive Home Page Sitemap:** Comprehensive visual site index for seamless navigation.
-
----
-
-## 🏗️ 2. System Architecture
+## 📊 Executive Project Status & Progress Tracker
 
 ```mermaid
-graph TD
-    subgraph Client["Frontend Layer (Client)"]
-        UI["React.js + Tailwind CSS UI"]
-        AuthContext["Auth & State Management"]
-        Components["Dashboard / Career Bank / Quiz / Media / Stories"]
-    end
-
-    subgraph Gateway["API & Middleware Layer"]
-        Express["Express.js Server (Node.js)"]
-        AuthGuard["JWT Auth & Role Guard (RBAC)"]
-        Multer["Multer (File/Resume Uploads)"]
-    end
-
-    subgraph Services["Core Application Services"]
-        CareerService["Career Search & Filtering Service"]
-        QuizService["Quiz Engine & Recommendation Logic"]
-        MediaService["Multimedia & Resource Handler"]
-        AnalyticsService["Admin Analytics & Sentiment Tracker"]
-        PDFService["PDF / Export Generator"]
-    end
-
-    subgraph Database["Data Persistence Layer"]
-        MongoDB[(MongoDB Atlas / Local)]
-        Cloudinary[(Cloud Storage / CDN - Resumes & Media)]
-    end
-
-    UI -->|HTTP / REST API / JSON| Express
-    Express --> AuthGuard
-    AuthGuard --> Services
-    Services --> MongoDB
-    Multer --> Cloudinary
+pie title PathSeeker Platform Module Progress
+    "Completed: Landing Page & GSAP Section" : 20
+    "Completed: AI Interest Quiz Engine (/quiz)" : 15
+    "Completed: Global Career Bank Explorer (/careers)" : 15
+    "Completed: Career Pathway Detail (/careers/:id)" : 10
+    "Completed: Auth & Multi-Role Onboarding (/login, /register)" : 15
+    "Remaining: Multimedia Hub (/multimedia)" : 8
+    "Remaining: Success Stories Timeline (/stories)" : 7
+    "Remaining: Resource Document Library (/resources)" : 5
+    "Remaining: Candidate Passport Dashboard (/dashboard)" : 5
 ```
 
----
-
-## 🌟 3. Key Functional Modules (SRS Alignment)
-
-### 3.1 🔐 User Authentication & Role Management
-- **Role-Based Registration & Login:** Dedicated onboarding flows for **Student**, **Graduate**, **Working Professional**, and direct access for **Admin**.
-- **Secure Sessions:** JWT-based stateless authentication with encrypted HTTP-only cookies / bearer tokens.
-- **Password Recovery:** Forgot Password / Reset Password via secure OTP / Tokenized Email verification.
-- **Dynamic Profile Management:** Manage education history, technical/soft skills, interests, work experience, and optional **Resume File Upload** (.pdf, .docx).
-
-### 3.2 📊 Personalized User Dashboard
-- **Role-Specific Greetings:** Dynamic greetings and progress indicators customized to the user's career stage.
-- **Activity & Progress Feed:** Recent quiz results, recently viewed careers, active bookmarks, and quick notes.
-- **Recommendation Engine:** Dynamic widgets such as *"Top Picks for You"*, *"Trending Careers"*, and *"If you liked this..."*.
-
-### 3.3 💼 Dynamic Career Bank (Advanced Filtering & Search)
-- **Extensive Job Database:** Detailed profiles including descriptions, required skills, learning roadmaps, salary ranges, and job demand.
-- **Multi-Level Filters:** Filter by industry domain (Tech, Healthcare, Business, Creative), skill match, salary range, and job growth.
-- **Smart Search:** Live autocomplete, instant search, and fuzzy keyword tolerance.
-- **Saved Filters:** Save custom filter combinations for instant 1-click access.
-
-### 3.4 🧠 Interactive & AI-Powered Interest Quiz
-- **Dynamic Question Types:** Multi-step wizard with timed questions, interactive sliders, and 1–5 Likert scale ratings.
-- **Progress Tracking:** Automatic quiz history logging with score comparisons over time.
-- **Career Stream Matching:** Intelligent scoring algorithm mapping quiz scores to optimal streams and trending job roles.
-
-### 3.5 🎥 Multimedia Learning Center
-- **Rich Media Support:** Embedded video masterclasses, audio podcasts, and animated career explainers.
-- **Custom Player Features:** Interactive transcript toggle, variable playback speed (0.5x – 2x), and related content cards.
-- **Feedback & Community Ratings:** 5-star ratings, thumbs-up/down, and user reviews.
-
-### 3.6 🏆 Success Stories Hub
-- **Card-Based Story Feed:** Filter inspirational career transitions by domain.
-- **Timeline-Style Storytelling:** Structured visual timeline displaying **Educational Path ➔ Major Challenges ➔ Milestones ➔ Career Breakthrough**.
-- **User Submissions:** Community users can submit their personal stories, subject to Admin approval.
-
-### 3.7 📚 Document Resource Library
-- **Categorized Downloads:** Career cheat-sheets, salary guides, interview checklists, and scholarship PDFs.
-- **Auto-Preview Modals:** In-browser document viewer popups before downloading.
-- **Analytics:** Download count tracking and popularity badges (*"Most Popular"*, *"Trending"*).
-
-### 3.8 📝 Bookmarking, Personal Notes & Export
-- **1-Click Bookmarking:** Bookmark careers, multimedia resources, and articles.
-- **Sticky Notes:** Attach personal notes and reflections to any saved item.
-- **PDF & Social Export:** Export saved roadmaps and notes into a clean, printable PDF document or share via email.
-
-### 3.9 🛡️ Admin Control Panel & Telemetry
-- **Full CRUD Management:** Manage Careers, Multimedia items, Quiz questions, and Resource files.
-- **Moderation Workflow:** Review, approve, or reject user-submitted success stories and feedback.
-- **Analytics Dashboard:** Visual charts (via Recharts/Chart.js) showing active users, quiz completion rates, popular career tracks, and feedback sentiment breakdown.
-
-### 3.10 ♿ UI/UX & Accessibility Enhancements
-- **Dark Mode Toggle:** Seamless system/light/dark mode toggle.
-- **Accessibility Controls:** Font-size scaling (`A-`, `A`, `A+`) and high-contrast styling.
-- **Smooth Feedback:** Skeleton loaders, video buffering spinners, toast notifications, and breadcrumb navigation.
-- **Home Page Sitemap:** Interactive visual site map embedded directly on the landing page for complete navigation transparency.
-
----
-
-## 🗄️ 4. Database Schema (MongoDB / Mongoose Models)
-
-```
-┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
-│     Users       │       │  UserProfiles   │       │     Careers     │
-├─────────────────┤       ├─────────────────┤       ├─────────────────┤
-│ _id (PK)        │◄──────┤ _id (PK)        │       │ _id (PK)        │
-│ name            │       │ user_id (FK)    │       │ title           │
-│ email (unique)  │       │ education_level │       │ domain          │
-│ password_hash   │       │ skills []       │       │ description     │
-│ role            │       │ interests []    │       │ required_skills │
-│ is_verified     │       │ resume_url      │       │ education_path  │
-│ created_at      │       │ updated_at      │       │ expected_salary │
-└────────┬────────┘       └─────────────────┘       │ demand_level    │
-         │                                          └────────┬────────┘
-         │                                                   │
-         ├──────────────────────┬────────────────────────────┤
-         │                      │                            │
-┌────────▼────────┐    ┌────────▼────────┐          ┌────────▼────────┐
-│   QuizResults   │    │    Bookmarks    │          │   Multimedia    │
-├─────────────────┤    ├─────────────────┤          ├─────────────────┤
-│ _id (PK)        │    │ _id (PK)        │          │ _id (PK)        │
-│ user_id (FK)    │    │ user_id (FK)    │          │ title           │
-│ answers []      │    │ item_id (FK)    │          │ type (vid/aud)  │
-│ score_breakdown │    │ item_type       │          │ url             │
-│ recommendations │    │ notes           │          │ tags []         │
-│ taken_at        │    │ created_at      │          │ rating_avg      │
-└─────────────────┘    └─────────────────┘          └─────────────────┘
-```
-
----
-
-## 🚀 5. Recommended Technology Stack & Architecture
-
-| Layer | Technology | Rationale & Performance Advantage |
-| :--- | :--- | :--- |
-| **Frontend Framework** | **React.js (v18+) with Vite** | Instant Hot-Module-Replacement (HMR), lightweight build output, and component modularity. |
-| **Styling & Design** | **Tailwind CSS (v3.4+)** | Utility-first, zero runtime overhead, instant dark mode (`dark:`), responsive breakpoints, and microscopic production bundle size. |
-| **UI Components & Icons** | **Shadcn UI + Radix UI + Lucide React** | Accessible, customizable headless components with sleek, modern UI aesthetics. |
-| **Animations** | **Framer Motion + GSAP** | Silky smooth page transitions, timeline story animations, and quiz micro-interactions. |
-| **Charts & Data Viz** | **Recharts** | Lightweight SVG-based charts for Quiz performance radar/bar graphs and Admin telemetry. |
-| **PDF Generation** | **jsPDF + html2canvas** | Client-side export of saved bookmarks, career notes, and passport summaries. |
-| **Backend Runtime** | **Node.js + Express.js** | Fast, asynchronous event-driven RESTful API backend. |
-| **Database** | **MongoDB & Mongoose ODM** | Flexible document modeling for career roadmaps, dynamic quiz schemas, and user profile data. |
-| **Authentication** | **JSON Web Tokens (JWT) + bcryptjs** | Secure, stateless authentication with role-based access control (RBAC). |
-| **File Storage** | **Cloudinary / Multer** | Secure cloud storage for user avatars, resumes, and document attachments. |
-| **Email Service** | **Nodemailer** | Automated OTP verification and password reset emails. |
-
-### 5.1 UI Asset Integration Mapping (from `D:\Website_Assets`)
-
-The project leverages a rich set of pre-built React + Tailwind CSS interactive components located in `D:\Website_Assets`:
-
-| Asset Category | Source Directory | PathSeeker Feature Integration |
-| :--- | :--- | :--- |
-| **Navbars** | `NAVBARS/01_Modern_Navbars`, `02_Supaste`, `03_IntegratedBio` | Glassmorphic floating navigation, live `SearchModal`, dark mode toggle, notification bell. |
-| **Hero Sections** | `HERO_SECTIONS/01_Timed_cards`, `02_Globe`, `05_Frosted_Glass` | High-impact Landing Page Hero with interactive career path previews & CTA triggers. |
-| **Auth Modules** | `AUTHENTICATION_PAGES/Combine/VoltAuthCard` | Multi-role tabbed Login & Registration (Student, Graduate, Professional, Admin). |
-| **Cards & Spotlights** | `CARDS/01_product_spot_light`, `03_Glowing_Cards`, `04_Ticket` | Interactive Career Bank cards, Top Picks widget, and Downloadable Resource cards. |
-| **Backgrounds** | `BACKGROUNDS/01_Dot_Grid_Wave`, `02_Morph_Gallery` | Interactive animated dot grid canvas for Hero, Quiz backdrop, and Auth pages. |
-| **Interactive Elements** | `01_OTHER_SECTION/15_Testimonials`, `11_3d_Data_Cards`, `14_Torch_Light` | Success Stories Hub, Interactive feature highlights, and timeline storytelling. |
-| **Buttons & Controls** | `OTHERS/04_Buttons`, `06_Animated_Blob` | Micro-animated CTA buttons, interactive quiz sliders, and filter badges. |
-| **Typography** | `TEXT_ANIMATIONS/01_Water_Inside_Text`, `02_Typography` | Dynamic branding headers and achievement score animations. |
-
----
-
-## 📦 6. Project Structure
-
-```bash
-quantic-career-passport/
-├── client/                     # Frontend (React + Vite + Tailwind CSS)
-│   ├── public/                 # Static assets, icons, sample PDFs
-│   ├── src/
-│   │   ├── assets/             # Images, illustrations, branding
-│   │   ├── components/         # Reusable UI components
-│   │   │   ├── common/         # Navbar, Footer, Breadcrumbs, DarkModeToggle, Modal
-│   │   │   ├── dashboard/      # Role-based widgets, RecentActivity, Recommendations
-│   │   │   ├── career/         # CareerCard, FilterSidebar, SearchBar, RoadmapView
-│   │   │   ├── quiz/           # QuizWizard, Timer, LikertScale, ResultRadar
-│   │   │   ├── multimedia/     # VideoPlayer, AudioPlayer, TranscriptViewer
-│   │   │   ├── stories/        # StoryTimeline, StoryCard, SubmissionModal
-│   │   │   └── admin/          # StatsCard, DataTable, ContentForm, SentimentChart
-│   │   ├── context/            # AuthContext, ThemeContext, BookmarkContext
-│   │   ├── hooks/              # Custom hooks (useAuth, useFetch, useDarkMode)
-│   │   ├── pages/              # View pages (Home, Dashboard, CareerBank, Quiz, Media, Stories, Library, Admin, Sitemap)
-│   │   ├── services/           # Axios API service clients
-│   │   ├── utils/              # PDF export helpers, formatters, validators
-│   │   ├── App.jsx             # Main router & layout configuration
-│   │   ├── index.css           # Tailwind CSS directives & custom design tokens
-│   │   └── main.jsx            # React root mount
-│   ├── index.html              # HTML5 entry with meta SEO tags
-│   ├── tailwind.config.js      # Tailwind configuration (colors, dark mode, typography)
-│   ├── vite.config.js          # Vite build config
-│   └── package.json
-│
-├── server/                     # Backend (Node.js + Express + MongoDB)
-│   ├── config/                 # DB connection (db.js), Cloudinary config, nodemailer
-│   ├── controllers/            # Request handlers (auth, career, quiz, media, story, admin)
-│   ├── middleware/             # authMiddleware (JWT), roleGuard, errorHandler, uploadMiddleware
-│   ├── models/                 # Mongoose schemas (User, Profile, Career, Quiz, Story, Resource, Feedback)
-│   ├── routes/                 # API route declarations (/api/v1/...)
-│   │   ├── authRoutes.js
-│   │   ├── careerRoutes.js
-│   │   ├── quizRoutes.js
-│   │   ├── multimediaRoutes.js
-│   │   ├── storyRoutes.js
-│   │   ├── resourceRoutes.js
-│   │   ├── feedbackRoutes.js
-│   │   └── adminRoutes.js
-│   ├── utils/                  # Recommendation engine algorithm, seed data helpers
-│   ├── seeds/                  # Initial seed scripts (careers, quiz questions, demo users)
-│   ├── server.js               # Express server entry point
-│   ├── .env.example            # Environment variable template
-│   └── package.json
-│
-├── docs/                       # Project Documentation & Reports
-│   ├── SRS_PathSeeker.pdf      # Original SRS document
-│   ├── Flowcharts/             # System and process flow diagrams
-│   └── Database_ERD.png        # Entity Relationship Diagram
-├── README.md                   # Primary project readme & guide
-└── package.json                # Root concurrently/workspace script
-```
-
----
-
-## ⚙️ 7. Installation & Setup Guide
-
-### 7.1 Prerequisites
-- **Node.js** (v18.x or higher)
-- **npm** (v9.x or higher) or **yarn** / **pnpm**
-- **MongoDB** (Local instance on port `27017` or MongoDB Atlas URI)
-
-### 7.2 Clone & Install Dependencies
-```bash
-# 1. Clone repository
-git clone https://github.com/your-username/pathseeker-career-passport.git
-cd pathseeker-career-passport
-
-# 2. Install Server Dependencies
-cd server
-npm install
-
-# 3. Install Client Dependencies
-cd ../client
-npm install
-```
-
-### 7.3 Environment Configuration
-
-#### Server (`server/.env`):
-```env
-PORT=5000
-NODE_ENV=development
-MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/pathseeker?retryWrites=true&w=majority
-JWT_SECRET=your_super_secret_jwt_key_here
-JWT_EXPIRE=7d
-
-# Email / Nodemailer (for OTP & password reset)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your_email@gmail.com
-SMTP_PASS=your_email_app_password
-
-# Cloudinary (Optional / for File Uploads)
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-
-CLIENT_URL=http://localhost:5173
-```
-
-#### Client (`client/.env`):
-```env
-VITE_API_BASE_URL=http://localhost:5000/api/v1
-```
-
-### 7.4 Database Seeding (Sample Data)
-Populate your database with complete career roles, quiz questionnaires, success stories, and demo accounts:
-```bash
-cd server
-npm run seed
-```
-
-### 7.5 Running the Application
-```bash
-# Run Server (from /server)
-npm run dev
-
-# Run Client (from /client in another terminal)
-npm run dev
-```
-Open **`http://localhost:5173`** in your browser.
-
----
-
-## 🔑 8. Default Test Credentials
-
-| Role | Email | Password | Access / Capabilities |
+| Module / Page | Route | Status | Key Highlights |
 | :--- | :--- | :--- | :--- |
-| **Admin** | `admin@pathseeker.com` | `Admin@12345` | Full control panel, content management, analytics, user & feedback moderation. |
-| **Student** | `student@pathseeker.com` | `Student@12345` | Student-tailored dashboard, interest quiz, career exploration, bookmarking, notes. |
-| **Graduate** | `graduate@pathseeker.com` | `Graduate@12345` | Graduate career roadmaps, skill gap filters, resume upload, multimedia hub. |
-| **Professional** | `pro@pathseeker.com` | `Pro@12345` | Career pivot roadmaps, salary insights, success story submission, resources. |
+| **Interactive Landing Page** | `/` | `COMPLETED` | 3D rotating globe, fluid typography, vertical GSAP multimedia conduit, persona matrix, ultra-glass cards, sitemap. |
+| **AI Interest Quiz & Stream Matching** | `/quiz` | `COMPLETED` | 7-step cognitive assessment, mathematical 6-axis RIASEC radar chart, Gemini AI service placeholder, exportable Career Passport certificate, 90-day roadmap. |
+| **Global Career Bank Explorer** | `/careers` | `COMPLETED` | 6 sections: market intelligence ticker, domain filter pills, salary slider, live search, side-by-side comparison matrix modal (up to 3 roles), fitted background cards. |
+| **Deep-Dive Career Pathway Detail** | `/careers/:id` | `COMPLETED` | 7 sections: role hero, 4-tier compensation ladder, hour-by-hour day in the life, skill tree matrix, 3-phase milestone roadmap, credentials, lateral pivots. |
+| **Auth & Multi-Role Onboarding** | `/login`, `/register` | `COMPLETED` | 3D Volt robot guardian (cursor eye-tracking, privacy turnaround, password meter), candidate stage selector, 3D isometric tabs with synchronized image previews. |
+| **Multimedia Masterclasses Hub** | `/multimedia`, `/multimedia/:id` | `UPCOMING` | Video player with synchronized live transcript accordions, audio podcasts, filterable categories, bookmarks, and speaker profiles. |
+| **Success Stories & Community Hub** | `/stories`, `/stories/submit` | `UPCOMING` | Visual 3-stage timeline storytelling (Education → Challenge → Outcome), peer upvoting, filter by career transition, story submission modal. |
+| **Document Resource Library** | `/resources` | `UPCOMING` | Downloadable career blueprints, salary guides, PDF live preview modal, category tabs, popularity sorting. |
+| **Candidate Career Passport Dashboard** | `/dashboard` | `UPCOMING` | Candidate credential ID card, saved bookmarks, learning roadmap progress tracker, notes engine, export summary to PDF. |
+| **Admin Control Panel & Analytics** | `/admin` | `UPCOMING` | Platform telemetry, user management, content moderation, career bank editor, sentiment insights. |
 
 ---
 
-## 📋 9. TechWiz Project Deliverables Checklist
+## 🚀 1. What Has Been Built (Completed Modules)
 
-- [x] **Problem Definition & Solution Architecture** documented.
-- [x] **Full-Stack MERN Application** with dynamic frontend and RESTful backend.
-- [x] **Tailwind CSS Design System** with Dark Mode, responsive layouts, and modern aesthetics.
-- [x] **Role-Based Authentication** with JWT, password reset, and protected routes.
-- [x] **Career Bank** with multi-level filtering and smart search.
-- [x] **Interactive Interest Quiz** with automated recommendations and history tracking.
-- [x] **Multimedia Center** with custom player, transcripts, and ratings.
-- [x] **Success Stories Hub** with visual timeline storytelling and user submission flow.
-- [x] **Document Resource Library** with PDF preview modals and download trackers.
-- [x] **Bookmarking & Sticky Notes** with downloadable PDF summary export.
-- [x] **Admin Dashboard** with full CRUD and usage analytics.
-- [x] **Home Page Sitemap** for comprehensive application workflow visibility.
-- [x] **Test Credentials & Seed Scripts** ready for evaluation.
-- [ ] **Demonstration Video (`.mp4`)**: Record and attach walkthrough video before final submission.
-- [ ] **Live Hosted Deployment**: Deploy frontend to Vercel/Netlify and backend to Render/Railway.
+### 🌟 1.1 Signature Ultra-Glassmorphism & Design System
+- **Color Palette:** Pure Pitch Black (`#000000`), Fiery Orange (`#E8602E`), Burnt Rust (`#BC4C22`), Gold Energy (`#FFB800`), Emerald (`#10B981`), Crisp White Headings (`#FFFFFF`), Soft Gray text (`#D4D4D8`).
+- **Glassmorphism Spec:** Frosted dark smoke glass (`rgba(18, 18, 24, 0.75)`), specular top border highlight (`border-t-[rgba(255,255,255,0.25)]`), multi-stop gradient masks, ambient orange refraction glow fields, and inner bevel shadows.
+- **Typography & Icons:** Google Fonts (*Outfit* / *Inter* / *Plus Jakarta Sans*) with FontAwesome SVG icons strictly (zero Unicode emojis).
 
 ---
 
-## 👥 10. Team & Submission Credits
-- **Project Name:** PathSeeker (Career Passport)
-- **Event:** Aptech TechWiz 6 Global AI-Based Tech Competition
-- **Theme:** Career Passport — Full-Stack Application Development
-- **Copyright:** © 2026 Aptech Limited & Team Quantic
+### 🌐 1.2 Interactive Landing Page (`/`)
+- **Notch Navigation Bar (`NotchNavbar.jsx`):** Sticky floating notch with active route pills, mobile drawer, and "Get Started" CTA.
+- **3D Hero Section (`HeroSection.jsx`):** Interactive Three.js wireframe rotating globe with glowing pinpoint markers, paired with water-fluid animated text shaders.
+- **Persona Selector (`PersonaSection.jsx`):** Role-tailored entry points for **Students**, **Fresh Graduates**, and **Working Professionals**.
+- **Vertical GSAP Multimedia Section (`MultimediaSection.jsx`):** 2200px vertical track, 3D perspective isometric tablet background, glowing curving SVG trails (`#linePath01`–`#linePath04`) driven by `--strokeDashoffset`, and masterclass cards with Framer Motion transcript accordions.
+- **Career Spotlight Section (`CareerSpotlightSection.jsx`):** Fitted content-related background images with high visibility (`opacity-60` to `80%`), hover zoom, and domain category tabs.
+- **Interactive Home Sitemap (`SitemapSection.jsx`):** Visual categorized site directory.
+- **Glass Footer (`Footer.jsx`):** Multi-column navigation, newsletter subscription input, and social links.
+
+---
+
+### 🧠 1.3 AI Interest Quiz & Stream Matching Engine (`/quiz`)
+- **7-Step Cognitive Assessment (`QuizQuestionCard.jsx` & `quizQuestions.js`):**
+  1. *Coding & Systems Automation* (1–10 Precision Slider)
+  2. *Visual Design, UI/UX & Aesthetics* (5-point Likert Scale)
+  3. *Quantitative Modeling & Math* (5-point Likert Scale)
+  4. *Social Empathy & Leadership* (5-point Likert Scale)
+  5. *Commercial Strategy & Business* (5-point Likert Scale)
+  6. *Systematic Precision & QA* (5-point Likert Scale)
+  7. *Preferred Work Velocity* (Interactive Scenario Choice Cards)
+- **Gemini AI Service Connector (`geminiService.js`):**
+  - Features designated API placeholder: `import.meta.env.VITE_GEMINI_API_KEY || "YOUR_GEMINI_API_KEY_HERE"`.
+  - Built-in heuristic intelligence fallback engine generating rich personalized recommendations even without an API key.
+- **Mathematical 6-Axis RIASEC Spider Chart (`RadarSkillChart.jsx`):** Real-time SVG polygon visualization plotting *Realistic, Investigative, Artistic, Social, Enterprising, Conventional* cognitive dimensions.
+- **Digital Career Passport Certificate (`PassportCertificate.jsx`):** Ultra-glass credential badge with custom ID (`#CP-2026-XXXX`), verified seal, QR code, and **Print / Export PDF** + **Share Link** buttons.
+- **Multi-Tab Comprehensive Results Dashboard (`QuizResults.jsx`):** Matched roles, radar aptitude breakdown, and 3-phase 90-day action roadmaps.
+
+---
+
+### 💼 1.4 Global Career Bank Explorer (`/careers`)
+- **Section 1: Hero & Market Intelligence Ticker:** Live ticker chips (*150+ Roles, $148k Avg Comp, +28% YoY AI/Cloud Growth, 12 Clusters*).
+- **Section 2: Multi-Filter Control Center (`CareerFilterBar.jsx`):** Real-time search debounce, domain category tabs, minimum target salary slider ($50k–$200k+), experience level dropdown, and reset filters button.
+- **Section 3: Sticky Bottom Comparison Matrix Tray & Modal (`CareerCompareModal.jsx`):** Compare any 2–3 careers side-by-side on compensation, demand, lifestyle scores, and hard skill overlaps.
+- **Section 4: Ultra-Glass Career Grid (`CareerCard.jsx`):** High-resolution content-specific background images fitted with frosted gradient masks, trending badges, bookmarking toggles, and direct roadmap links.
+- **Section 5: Macroeconomic Compensation Benchmarks:** Industry domain salary comparison matrix.
+- **Section 6: AI Interest Match Callout:** Direct conduit directing users to `/quiz`.
+
+---
+
+### 🗺️ 1.5 Deep-Dive Career Pathway Detail (`/careers/:id`)
+- **Section 1: Role Hero & Passport Code Badge:** Title, category, Passport ID (`#CP-AI-01`), exponential demand badge, bookmark, and share actions.
+- **Section 2: 4-Tier Compensation Progression Ladder (`SalaryProgressionLadder.jsx`):** Interactive ladder tracking expectations from *Junior Associate* ➔ *Mid-Level* ➔ *Senior Specialist* ➔ *Principal Architect*.
+- **Section 3: Hour-by-Hour "Day in the Life" Timeline (`DayInLifeTimeline.jsx`):** Interactive daily operational schedule from morning standup to architecture coding and research reading.
+- **Section 4: Core Skill Tree & Tool Stack Matrix (`SkillTreeMatrix.jsx`):** Categorized Technical Hard Skills, Soft Competencies, and Essential Industry Tools.
+- **Section 5: 3-Phase Step-by-Step Verified Learning Roadmap (`RoadmapTimeline.jsx`):** Interactive milestone checklist with checkboxes and capstone requirements.
+- **Section 6: Certified Credentials & Academic Prerequisites:** Recommended industry certifications and education pathways.
+- **Section 7: Adjacent Career Lateral Pivots:** Lateral career branches allowing users to inspect related roles.
+
+---
+
+### 🤖 1.6 User Authentication & Multi-Role Onboarding (`/login` & `/register`)
+- **Interactive 3D Robot Guardian ("Volt") (`VoltAuthCard.jsx`):**
+  - Real-time 3D head and eye cursor tracking (`rotateX`, `rotateY`, `translateY`).
+  - Follows typing character length.
+  - Zero-knowledge privacy turn-around: Robot turns 180° around on password focus.
+  - Back-head password strength meter with 4-level LED indicators.
+  - Contextual speech bubble assistant for PathSeeker onboarding.
+- **Multi-Role Candidate Onboarding:** Candidate stage selector (*Student Pathway, Fresh Graduate Pathway, Working Professional*).
+- **Curved Sliding Panels:** Smooth animated transitions between Login and Registration modes.
+- **Flanking 3D Isometric Navigation Cards (`TabNavigation.jsx` & `AuthPage.jsx`):**
+  - **Left Card:** Heading + FontAwesome Icon + Paragraph (*Passport Quantum Vault, AI Telemetry Signals, Zero-Knowledge Privacy*).
+  - **Right 3D Isometric Card:** High-resolution synchronized visual preview images matching the active left-side tab in real time.
+- **Full Viewport Animated Background:** Fixed `100vw x 100vh` background transition between `/login_bg.png` and `/signup_bg.png`.
+
+---
+
+## ⏳ 2. What Is Remaining (To Be Built)
+
+```
+├── 1. Multimedia Masterclasses Hub (/multimedia & /multimedia/:id)
+│   ├── Video Player with Synchronized Transcript Accordions
+│   ├── Audio Podcast Player with Speed Controls & Waveforms
+│   ├── Filter by Domain & Career Track
+│   └── Speaker / Mentor Profiles & Interactive Comments
+│
+├── 2. Success Stories & Community Hub (/stories & /stories/submit)
+│   ├── Visual 3-Stage Journey Timeline (Education → Challenge → Outcome)
+│   ├── Filter by Career Transition (e.g. Non-tech to AI Engineer)
+│   ├── Story Submission Modal with Image Upload
+│   └── Community Upvoting & Bookmarking
+│
+├── 3. Document Resource Library (/resources)
+│   ├── Downloadable Career Blueprints, Cheat Sheets & PDF Guides
+│   ├── Interactive Live PDF Preview Modal
+│   ├── Filter by Category & Popularity Sorting
+│   └── Download Counter Telemetry
+│
+├── 4. Candidate Career Passport Dashboard (/dashboard)
+│   ├── Candidate Digital Passport ID Card with QR Code
+│   ├── Saved Bookmarks & Pinned Roadmaps
+│   ├── Milestone Progress Tracking & Checklist Storage
+│   └── Export My Passport Summary to PDF
+│
+└── 5. Admin Control Panel & Platform Telemetry (/admin)
+    ├── Platform Analytics & User Traffic Overview
+    ├── Career Bank CRUD Content Management
+    ├── Success Stories Moderation Queue
+    └── Real-Time Quiz Score Telemetry
+```
+
+---
+
+## 🛠️ 3. Technology Stack & Setup
+
+### Frontend Architecture
+- **Framework:** React 18 (Vite Bundler)
+- **Styling:** Vanilla Tailwind CSS + Custom Ultra-Glassmorphism Design System
+- **Animation & 3D:** GSAP (ScrollTrigger), Three.js, Lucide/FontAwesome SVG icons, Framer Motion
+- **AI Integration:** Google Gemini 1.5 Flash API connector with deterministic heuristic fallback
+
+### Running the Application Locally
+```bash
+# 1. Navigate to client folder
+cd client
+
+# 2. Install dependencies
+npm install
+
+# 3. Start development server
+npm run dev
+
+# 4. Verify production build
+npm run build
+```
+
+---
+
+## 🧭 4. Next Step Recommendation
+
+To continue building out the complete PathSeeker application systematically, here is the recommended sequence:
+
+1. **Option 4 (Recommended Next): Multimedia Center & Interactive Podcast Hub (`/multimedia` & `/multimedia/:id`)**
+   - *Rationale:* Builds on top of our existing vertical GSAP multimedia section, providing a dedicated masterclass streaming library with video players, interactive synchronized transcript accordions, audio podcasts, and mentor profiles.
+2. **Option 5: Success Stories & Community Timeline Hub (`/stories`)**
+3. **Option 6: Document Resource Library (`/resources`)**
+4. **Option 7: Candidate Career Passport Dashboard (`/dashboard`)**

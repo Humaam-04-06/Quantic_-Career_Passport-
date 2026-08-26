@@ -6,6 +6,8 @@ import QuizPage from './pages/QuizPage.jsx';
 import CareersPage from './pages/CareersPage.jsx';
 import CareerDetailPage from './pages/CareerDetailPage.jsx';
 import AuthPage from './pages/AuthPage.jsx';
+import MultimediaPage from './pages/MultimediaPage.jsx';
+import MediaDetailPage from './pages/MediaDetailPage.jsx';
 
 export default function App() {
   return (
@@ -26,9 +28,11 @@ export default function App() {
           <Route path="/quiz" element={<QuizPage />} />
           <Route path="/careers" element={<CareersPage />} />
           <Route path="/careers/:id" element={<CareerDetailPage />} />
+          <Route path="/multimedia" element={<MultimediaPage />} />
+          <Route path="/multimedia/:id" element={<MediaDetailPage />} />
           <Route path="/login" element={<AuthPage mode="login" />} />
           <Route path="/register" element={<AuthPage mode="register" />} />
-          {/* Future Routes (Media, Stories, Resources, Dashboard) */}
+          {/* Future Routes (Stories, Resources, Dashboard) */}
           <Route path="*" element={<LandingPage />} />
         </Routes>
       </div>
