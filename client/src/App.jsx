@@ -8,6 +8,8 @@ import CareerDetailPage from './pages/CareerDetailPage.jsx';
 import AuthPage from './pages/AuthPage.jsx';
 import MultimediaPage from './pages/MultimediaPage.jsx';
 import MediaDetailPage from './pages/MediaDetailPage.jsx';
+import StoriesPage from './pages/StoriesPage.jsx';
+import StorySubmitPage from './pages/StorySubmitPage.jsx';
 
 export default function App() {
   return (
@@ -30,9 +32,11 @@ export default function App() {
           <Route path="/careers/:id" element={<CareerDetailPage />} />
           <Route path="/multimedia" element={<MultimediaPage />} />
           <Route path="/multimedia/:id" element={<MediaDetailPage />} />
+          <Route path="/stories" element={<StoriesPage />} />
+          <Route path="/stories/submit" element={<StorySubmitPage />} />
           <Route path="/login" element={<AuthPage mode="login" />} />
           <Route path="/register" element={<AuthPage mode="register" />} />
-          {/* Future Routes (Stories, Resources, Dashboard) */}
+          {/* Future Routes (Resources, Dashboard) */}
           <Route path="*" element={<LandingPage />} />
         </Routes>
       </div>
