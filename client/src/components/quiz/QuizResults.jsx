@@ -115,47 +115,69 @@ export default function QuizResults({ analysis, scores, persona, onRetake }) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {analysis.recommendedRoles.map((role, idx) => (
-              <div
-                key={idx}
-                className="p-7 rounded-[2rem] glass-card-interactive flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-[#E8602E] bg-[#E8602E]/10 backdrop-blur-md px-2.5 py-0.5 rounded border border-[#E8602E]/30">
-                      Rank #{idx + 1} Fit
-                    </span>
-                    <span className="text-xs font-bold text-white flex items-center gap-1">
-                      <FontAwesomeIcon icon={faCheckCircle} className="text-[#E8602E] text-xs" />
-                      <span>{role.fit} Match</span>
-                    </span>
+            {analysis.recommendedRoles.map((role, idx) => {
+              const bgImages = [
+                'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1581291518655-9523c93269c4?auto=format&fit=crop&w=800&q=80',
+              ];
+              const bgImg = bgImages[idx % bgImages.length];
+
+              return (
+                <div
+                  key={idx}
+                  className="group relative p-7 rounded-[2rem] glass-card-interactive flex flex-col justify-between overflow-hidden"
+                >
+                  {/* Content Background Image */}
+                  <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                    <img
+                      src={bgImg}
+                      alt={role.title}
+                      className="w-full h-full object-cover opacity-20 group-hover:opacity-35 group-hover:scale-110 transition-all duration-700 ease-out"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0E] via-[#0D0D12]/90 to-[#0A0A0E]/75 backdrop-blur-[2px]" />
+                    <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-[#E8602E]/15 blur-2xl group-hover:bg-[#E8602E]/25 transition-all" />
                   </div>
 
-                  <h4 className="text-xl font-extrabold font-display text-white mb-4 leading-snug">
-                    {role.title}
-                  </h4>
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-[10px] uppercase font-bold tracking-wider text-[#E8602E] bg-[#E8602E]/10 backdrop-blur-md px-2.5 py-0.5 rounded border border-[#E8602E]/30">
+                        Rank #{idx + 1} Fit
+                      </span>
+                      <span className="text-xs font-bold text-white flex items-center gap-1">
+                        <FontAwesomeIcon icon={faCheckCircle} className="text-[#E8602E] text-xs" />
+                        <span>{role.fit} Match</span>
+                      </span>
+                    </div>
 
-                  <div className="space-y-2.5 p-3.5 rounded-2xl bg-white/[0.04] backdrop-blur-md border border-white/10 text-xs mb-6">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[#A1A1AA]">Compensation:</span>
-                      <span className="font-bold text-white">{role.salary}</span>
+                    <h4 className="text-xl font-extrabold font-display text-white mb-4 leading-snug">
+                      {role.title}
+                    </h4>
+
+                    <div className="space-y-2.5 p-3.5 rounded-2xl bg-white/[0.04] backdrop-blur-md border border-white/10 text-xs mb-6">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[#A1A1AA]">Compensation:</span>
+                        <span className="font-bold text-white font-mono">{role.salary}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[#A1A1AA]">Market Demand:</span>
+                        <span className="font-bold text-[#10B981]">{role.demand}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[#A1A1AA]">Market Demand:</span>
-                      <span className="font-bold text-[#10B981]">{role.demand}</span>
-                    </div>
+                  </div>
+
+                  <div className="relative z-10">
+                    <Link
+                      to="/careers"
+                      className="w-full py-2.5 rounded-xl bg-white/[0.06] hover:bg-[#E8602E] text-white text-xs font-bold border border-white/15 hover:border-[#E8602E] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                    >
+                      <span>View Verified Career Roadmap</span>
+                      <FontAwesomeIcon icon={faArrowRight} className="text-[10px]" />
+                    </Link>
                   </div>
                 </div>
-
-                <Link
-                  to="/careers"
-                  className="w-full py-2.5 rounded-xl bg-white/[0.06] hover:bg-[#E8602E] text-white text-xs font-bold border border-white/15 hover:border-[#E8602E] transition-all flex items-center justify-center gap-2 shadow-sm"
-                >
-                  <span>View Verified Career Roadmap</span>
-                  <FontAwesomeIcon icon={faArrowRight} className="text-[10px]" />
-                </Link>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
