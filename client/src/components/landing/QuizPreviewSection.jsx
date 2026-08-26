@@ -56,14 +56,15 @@ export default function QuizPreviewSection() {
   const match = calculateLiveMatch();
 
   return (
-    <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-[#070709] border-t border-[#1C1C22]">
-      {/* Center Spotlight */}
-      <div className="ambient-orange-spotlight top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20 pointer-events-none" />
+    <section className="relative py-28 px-4 sm:px-6 lg:px-8 bg-[#000000] border-t border-white/10 overflow-hidden">
+      {/* Underlying Glow Orbs for Glass Refraction */}
+      <div className="ambient-orange-spotlight top-1/2 left-1/3 opacity-30 pointer-events-none" />
+      <div className="ambient-orange-spotlight bottom-10 right-1/4 opacity-25 pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#121215] border border-[#232328] text-xs font-semibold text-[#E8602E] mb-3">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-pill text-xs font-semibold text-[#E8602E] mb-4">
             <FontAwesomeIcon icon={faBrain} className="text-xs" />
             <span>Interactive Assessment Preview</span>
           </div>
@@ -77,17 +78,17 @@ export default function QuizPreviewSection() {
           </p>
         </div>
 
-        {/* Interactive Mini-Assessment Box */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-5xl mx-auto">
+        {/* Interactive Mini-Assessment Box with Ultra-Glass Sheen */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch max-w-5xl mx-auto">
           {/* Left: Interactive Controls */}
-          <div className="lg:col-span-7 p-6 sm:p-8 rounded-3xl bg-[#0D0D10] border border-[#222226] shadow-[0_15px_40px_rgba(0,0,0,0.9)] space-y-7">
+          <div className="lg:col-span-7 p-7 sm:p-9 rounded-[2rem] glass-panel-ultra space-y-7 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-[#A1A1AA] flex items-center gap-1.5">
                   <FontAwesomeIcon icon={faSliders} className="text-[#E8602E]" />
                   <span>Question 1: Coding & Algorithmic Automation</span>
                 </span>
-                <span className="text-xs font-mono font-bold text-[#E8602E]">{techSlider}/10</span>
+                <span className="text-xs font-mono font-bold text-[#E8602E] bg-[#E8602E]/10 px-2 py-0.5 rounded border border-[#E8602E]/30">{techSlider}/10</span>
               </div>
               <p className="text-xs text-[#D4D4D8] mb-3">
                 How excited are you to architect scalable code, solve logic puzzles, or build automated systems?
@@ -98,7 +99,7 @@ export default function QuizPreviewSection() {
                 max="10"
                 value={techSlider}
                 onChange={(e) => setTechSlider(Number(e.target.value))}
-                className="w-full h-2 bg-[#1A1A22] rounded-lg appearance-none cursor-pointer accent-[#E8602E]"
+                className="w-full h-2.5 bg-white/[0.08] backdrop-blur-md rounded-lg appearance-none cursor-pointer accent-[#E8602E]"
               />
               <div className="flex justify-between text-[10px] text-[#71717A] mt-1">
                 <span>1 (Non-Technical)</span>
@@ -123,8 +124,8 @@ export default function QuizPreviewSection() {
                     onClick={() => setCreativeRating(val)}
                     className={`py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
                       creativeRating === val
-                        ? 'bg-[#E8602E] text-white border-[#E8602E] shadow-glow-orange-sm'
-                        : 'bg-[#141418] text-[#A1A1AA] border-[#262630] hover:text-white'
+                        ? 'bg-[#E8602E] text-white border-white/30 shadow-glow-orange-sm'
+                        : 'bg-white/[0.04] text-[#A1A1AA] border-white/10 hover:bg-white/[0.08] hover:text-white backdrop-blur-sm'
                     }`}
                   >
                     {val}
@@ -153,8 +154,8 @@ export default function QuizPreviewSection() {
                     onClick={() => setAnalyticalRating(val)}
                     className={`py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
                       analyticalRating === val
-                        ? 'bg-[#E8602E] text-white border-[#E8602E] shadow-glow-orange-sm'
-                        : 'bg-[#141418] text-[#A1A1AA] border-[#262630] hover:text-white'
+                        ? 'bg-[#E8602E] text-white border-white/30 shadow-glow-orange-sm'
+                        : 'bg-white/[0.04] text-[#A1A1AA] border-white/10 hover:bg-white/[0.08] hover:text-white backdrop-blur-sm'
                     }`}
                   >
                     {val}
@@ -165,10 +166,10 @@ export default function QuizPreviewSection() {
           </div>
 
           {/* Right: Live Dynamic Prediction Card */}
-          <div className="lg:col-span-5 p-7 sm:p-8 rounded-3xl bg-[#121216] border border-[#E8602E]/40 shadow-[0_20px_50px_rgba(232,96,46,0.15)] flex flex-col justify-between h-full">
+          <div className="lg:col-span-5 p-7 sm:p-9 rounded-[2rem] glass-card-interactive flex flex-col justify-between h-full">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#E8602E] bg-[#E8602E]/10 px-2.5 py-1 rounded-md border border-[#E8602E]/20">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#E8602E] bg-[#E8602E]/10 backdrop-blur-md px-2.5 py-1 rounded-md border border-[#E8602E]/30">
                   Live Match Engine
                 </span>
                 <span className="text-xs font-bold text-white flex items-center gap-1.5">
@@ -184,7 +185,7 @@ export default function QuizPreviewSection() {
                 Top matched career track for your inputs:
               </p>
 
-              <div className="p-4 rounded-2xl bg-[#0A0A0C] border border-[#232328] mb-5">
+              <div className="p-4 rounded-2xl bg-white/[0.04] backdrop-blur-md border border-white/10 mb-5">
                 <span className="text-[10px] uppercase font-bold tracking-wider text-[#71717A] block mb-1">
                   Recommended Primary Role
                 </span>

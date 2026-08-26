@@ -68,14 +68,15 @@ export default function PersonaSection() {
     : PERSONA_PASSES.filter(p => p.id.includes(filterMode));
 
   return (
-    <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-[#000000] border-t border-[#1C1C22]">
-      {/* Background Glow */}
-      <div className="ambient-orange-spotlight top-1/3 right-10 opacity-30 pointer-events-none" />
+    <section className="relative py-28 px-4 sm:px-6 lg:px-8 bg-[#000000] border-t border-white/10 overflow-hidden">
+      {/* Underlying Ambient Glow Orbs for Glass Refraction */}
+      <div className="ambient-orange-spotlight top-1/4 left-1/4 opacity-40 pointer-events-none" />
+      <div className="ambient-orange-spotlight bottom-10 right-10 opacity-30 pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#121215] border border-[#232328] text-xs font-semibold text-[#E8602E] mb-4">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-pill text-xs font-semibold text-[#E8602E] mb-4">
             <FontAwesomeIcon icon={faWandMagicSparkles} className="text-xs" />
             <span>Role-Based Career Passports</span>
           </div>
@@ -88,44 +89,44 @@ export default function PersonaSection() {
             PathSeeker segments your career exploration journey based on where you are right now. Choose your passport to unlock customized roadmaps, tools, and benchmarks.
           </p>
 
-          {/* Filter Pills */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mt-8">
+          {/* Frosted Glass Filter Pills */}
+          <div className="flex flex-wrap items-center justify-center gap-2.5 mt-8 p-1.5 max-w-fit mx-auto rounded-full glass-pill">
             <button
               onClick={() => setFilterMode('all')}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+              className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 filterMode === 'all'
                   ? 'bg-[#E8602E] text-white shadow-glow-orange-sm'
-                  : 'bg-[#121215] text-[#A1A1AA] hover:text-white border border-[#232328]'
+                  : 'text-[#A1A1AA] hover:text-white hover:bg-white/[0.05]'
               }`}
             >
               All Passports (3)
             </button>
             <button
               onClick={() => setFilterMode('student')}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+              className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 filterMode === 'student'
                   ? 'bg-[#E8602E] text-white shadow-glow-orange-sm'
-                  : 'bg-[#121215] text-[#A1A1AA] hover:text-white border border-[#232328]'
+                  : 'text-[#A1A1AA] hover:text-white hover:bg-white/[0.05]'
               }`}
             >
               Students
             </button>
             <button
               onClick={() => setFilterMode('graduate')}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+              className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 filterMode === 'graduate'
                   ? 'bg-[#E8602E] text-white shadow-glow-orange-sm'
-                  : 'bg-[#121215] text-[#A1A1AA] hover:text-white border border-[#232328]'
+                  : 'text-[#A1A1AA] hover:text-white hover:bg-white/[0.05]'
               }`}
             >
               Graduates
             </button>
             <button
               onClick={() => setFilterMode('pro')}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+              className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 filterMode === 'pro'
                   ? 'bg-[#E8602E] text-white shadow-glow-orange-sm'
-                  : 'bg-[#121215] text-[#A1A1AA] hover:text-white border border-[#232328]'
+                  : 'text-[#A1A1AA] hover:text-white hover:bg-white/[0.05]'
               }`}
             >
               Working Professionals

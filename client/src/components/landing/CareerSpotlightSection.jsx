@@ -102,15 +102,16 @@ export default function CareerSpotlightSection() {
   });
 
   return (
-    <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-[#000000] border-t border-[#1C1C22]">
-      {/* Background Ambient Spotlight */}
-      <div className="ambient-orange-spotlight top-1/2 left-10 opacity-25 pointer-events-none" />
+    <section className="relative py-28 px-4 sm:px-6 lg:px-8 bg-[#000000] border-t border-white/10 overflow-hidden">
+      {/* Background Ambient Spotlights */}
+      <div className="ambient-orange-spotlight top-1/3 left-10 opacity-35 pointer-events-none" />
+      <div className="ambient-orange-spotlight bottom-10 right-10 opacity-25 pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#121215] border border-[#232328] text-xs font-semibold text-[#E8602E] mb-3">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-pill text-xs font-semibold text-[#E8602E] mb-4">
               <FontAwesomeIcon icon={faCompass} className="text-xs" />
               <span>Career Bank Exploration</span>
             </div>
@@ -131,18 +132,18 @@ export default function CareerSpotlightSection() {
           </Link>
         </div>
 
-        {/* Filter Bar & Search */}
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-3 rounded-2xl bg-[#0E0E12] border border-[#232328] mb-10">
+        {/* Filter Bar & Search in Frosted Glass Panel */}
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-3.5 rounded-3xl glass-panel-ultra mb-12">
           {/* Domain Pills */}
           <div className="flex items-center gap-2 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 scrollbar-none">
             {DOMAINS.map((domain) => (
               <button
                 key={domain}
                 onClick={() => setSelectedDomain(domain)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                   selectedDomain === domain
                     ? 'bg-[#E8602E] text-white shadow-glow-orange-sm'
-                    : 'text-[#A1A1AA] hover:text-white hover:bg-[#18181C]'
+                    : 'text-[#A1A1AA] hover:text-white hover:bg-white/[0.06]'
                 }`}
               >
                 {domain}
@@ -150,7 +151,7 @@ export default function CareerSpotlightSection() {
             ))}
           </div>
 
-          {/* Quick Filter Search */}
+          {/* Quick Filter Search Input */}
           <div className="relative w-full lg:w-72">
             <FontAwesomeIcon
               icon={faSearch}
@@ -161,26 +162,26 @@ export default function CareerSpotlightSection() {
               placeholder="Search roles or skills..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#141418] text-white placeholder-[#71717A] text-xs pl-9 pr-4 py-2.5 rounded-xl border border-[#232328] focus:border-[#E8602E] focus:outline-none transition-all"
+              className="w-full glass-input text-white placeholder-[#71717A] text-xs pl-9 pr-4 py-2.5 rounded-2xl focus:outline-none transition-all"
             />
           </div>
         </div>
 
-        {/* Career Spotlight Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Career Spotlight Cards Grid with Ultra-Glass Sheen */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
           {filteredCareers.map((career) => (
             <div
               key={career.id}
-              className="group relative p-6 rounded-3xl bg-[#0D0D10] border border-[#222226] hover:border-[#E8602E]/60 shadow-[0_10px_30px_rgba(0,0,0,0.8)] hover:shadow-glow-orange-sm transition-all duration-300 flex flex-col justify-between"
+              className="group relative p-7 rounded-[2rem] glass-card-interactive flex flex-col justify-between"
             >
               <div>
                 {/* Header Meta: Domain & Trending Badge */}
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-3.5">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-[#A1A1AA]">
                     {career.domain}
                   </span>
                   {career.isTrending && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#E8602E]/15 border border-[#E8602E]/40 text-[#E8602E] text-[10px] font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#E8602E]/20 border border-[#E8602E]/40 text-[#E8602E] text-[10px] font-bold backdrop-blur-md">
                       <FontAwesomeIcon icon={faFire} className="text-[9px]" />
                       <span>Trending</span>
                     </span>
@@ -188,7 +189,7 @@ export default function CareerSpotlightSection() {
                 </div>
 
                 {/* Title */}
-                <h3 className="text-xl font-extrabold font-display text-white mb-2 group-hover:text-[#FFE8DE] transition-colors">
+                <h3 className="text-xl font-extrabold font-display text-white mb-2.5 group-hover:text-[#FFE8DE] transition-colors">
                   {career.title}
                 </h3>
 
@@ -202,7 +203,7 @@ export default function CareerSpotlightSection() {
                   {career.skills.map((skill, idx) => (
                     <span
                       key={idx}
-                      className="px-2.5 py-1 rounded-lg text-[10px] font-medium bg-[#16161A] text-[#D4D4D8] border border-[#26262E]"
+                      className="px-2.5 py-1 rounded-xl text-[10px] font-medium bg-white/[0.05] text-[#D4D4D8] border border-white/10 backdrop-blur-sm"
                     >
                       {skill}
                     </span>
@@ -212,7 +213,7 @@ export default function CareerSpotlightSection() {
 
               <div>
                 {/* Salary & Demand Metric Box */}
-                <div className="p-3.5 rounded-2xl bg-[#121215] border border-[#222226] flex items-center justify-between mb-4">
+                <div className="p-3.5 rounded-2xl bg-white/[0.04] backdrop-blur-md border border-white/10 flex items-center justify-between mb-4">
                   <div>
                     <span className="text-[10px] text-[#A1A1AA] uppercase tracking-wider block">
                       Salary Range
@@ -234,7 +235,7 @@ export default function CareerSpotlightSection() {
                 {/* Action Link */}
                 <Link
                   to={`/careers/${career.id}`}
-                  className="w-full py-2.5 rounded-xl bg-[#16161A] hover:bg-[#E8602E] text-[#D4D4D8] hover:text-white text-xs font-bold border border-[#2B2B33] hover:border-[#E8602E] transition-all flex items-center justify-center gap-2 group/btn"
+                  className="w-full py-2.5 rounded-xl bg-white/[0.06] hover:bg-[#E8602E] text-[#D4D4D8] hover:text-white text-xs font-bold border border-white/15 hover:border-[#E8602E] transition-all flex items-center justify-center gap-2 group/btn shadow-sm"
                 >
                   <span>Explore Verified Roadmap</span>
                   <FontAwesomeIcon

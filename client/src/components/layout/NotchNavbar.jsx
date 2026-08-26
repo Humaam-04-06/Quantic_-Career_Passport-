@@ -68,11 +68,11 @@ export default function NotchNavbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none px-4">
-      {/* Central Floating Black Notch Bar */}
-      <div className="relative pointer-events-auto bg-black text-white px-5 py-2.5 rounded-b-[24px] shadow-2xl flex items-center justify-between gap-6 sm:gap-8 max-w-full">
+      {/* Central Floating Frosted Glass Notch Bar */}
+      <div className="relative pointer-events-auto bg-[#08080C]/80 backdrop-blur-2xl text-white px-5 py-2.5 rounded-b-[24px] border-b border-x border-white/15 shadow-[0_15px_35px_rgba(0,0,0,0.8)] flex items-center justify-between gap-6 sm:gap-8 max-w-full">
         {/* Left Inverted Corner SVG Curve */}
         <svg
-          className="notch-curve-left text-black fill-current"
+          className="notch-curve-left text-[#08080C]/80 fill-current"
           viewBox="0 0 20 20"
           aria-hidden="true"
         >
@@ -81,7 +81,7 @@ export default function NotchNavbar() {
 
         {/* Right Inverted Corner SVG Curve */}
         <svg
-          className="notch-curve-right text-black fill-current"
+          className="notch-curve-right text-[#08080C]/80 fill-current"
           viewBox="0 0 20 20"
           aria-hidden="true"
         >
@@ -107,10 +107,10 @@ export default function NotchNavbar() {
           onMouseLeave={handleMouseLeave}
           className="hidden md:flex items-center gap-1 relative py-1"
         >
-          {/* Active / Hover Background Pill */}
+          {/* Active / Hover Background Glass Pill */}
           <div
             ref={pillRef}
-            className="absolute top-1 bottom-1 bg-white/15 rounded-full pointer-events-none opacity-0"
+            className="absolute top-1 bottom-1 bg-white/15 backdrop-blur-md rounded-full pointer-events-none opacity-0 border border-white/20"
             style={{ left: 0, width: 0 }}
           />
 
@@ -122,7 +122,7 @@ export default function NotchNavbar() {
                 setActiveTab(link.name);
                 navigate(link.path);
               }}
-              className={`relative z-10 px-3.5 py-1 text-xs sm:text-[13px] font-medium transition-colors rounded-full ${
+              className={`relative z-10 px-3.5 py-1 text-xs sm:text-[13px] font-medium transition-colors rounded-full cursor-pointer ${
                 activeTab === link.name
                   ? 'text-white font-semibold'
                   : 'text-slate-300 hover:text-white'
@@ -133,11 +133,11 @@ export default function NotchNavbar() {
           ))}
         </nav>
 
-        {/* 3. ACTION CAPSULE BUTTON (Exact Supaste Pill Button in Orange Theme) */}
+        {/* 3. ACTION CAPSULE BUTTON */}
         <div className="flex items-center gap-2">
           <Link
             to="/register"
-            className="group flex items-center gap-1.5 bg-[#E8602E] hover:bg-[#BC4C22] text-white px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-md flex-shrink-0"
+            className="group flex items-center gap-1.5 btn-primary-orange px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-md flex-shrink-0"
           >
             <FontAwesomeIcon icon={faRocket} className="w-3.5 h-3.5 mb-0.5" />
             <span>Get Started</span>
@@ -146,7 +146,7 @@ export default function NotchNavbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10"
+            className="md:hidden p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 cursor-pointer"
             aria-label="Toggle Navigation Menu"
           >
             <FontAwesomeIcon icon={mobileOpen ? faXmark : faBars} className="w-4 h-4" />
@@ -155,7 +155,7 @@ export default function NotchNavbar() {
 
         {/* Mobile Dropdown Drawer */}
         {mobileOpen && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-black/95 backdrop-blur-xl p-4 rounded-2xl border border-white/10 shadow-2xl flex flex-col gap-2 md:hidden">
+          <div className="absolute top-full left-0 right-0 mt-2 glass-panel-ultra p-4 rounded-3xl shadow-2xl flex flex-col gap-2 md:hidden">
             {navLinks.map((link) => (
               <button
                 key={link.name}
@@ -164,9 +164,9 @@ export default function NotchNavbar() {
                   setMobileOpen(false);
                   navigate(link.path);
                 }}
-                className={`text-left px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+                className={`text-left px-4 py-2 rounded-2xl text-sm font-medium transition-colors ${
                   activeTab === link.name
-                    ? 'bg-[#E8602E]/25 text-[#E8602E] font-bold'
+                    ? 'bg-[#E8602E]/25 text-[#E8602E] font-bold border border-[#E8602E]/40'
                     : 'text-slate-300 hover:bg-white/10'
                 }`}
               >
@@ -177,14 +177,14 @@ export default function NotchNavbar() {
               <Link
                 to="/login"
                 onClick={() => setMobileOpen(false)}
-                className="flex-1 text-center py-2 rounded-xl bg-white/10 text-white text-xs font-semibold"
+                className="flex-1 text-center py-2 rounded-xl bg-white/10 text-white text-xs font-semibold hover:bg-white/15 transition-colors"
               >
                 Login
               </Link>
               <Link
                 to="/register"
                 onClick={() => setMobileOpen(false)}
-                className="flex-1 text-center py-2 rounded-xl bg-[#E8602E] text-white text-xs font-bold"
+                className="flex-1 text-center py-2 rounded-xl btn-primary-orange text-xs font-bold"
               >
                 Sign Up
               </Link>

@@ -58,15 +58,16 @@ export default function StoriesSection() {
   };
 
   return (
-    <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-[#07070A] border-t border-[#1C1C22]">
+    <section className="relative py-28 px-4 sm:px-6 lg:px-8 bg-[#000000] border-t border-white/10 overflow-hidden">
       {/* Background Glow */}
-      <div className="ambient-orange-spotlight top-1/3 left-10 opacity-20 pointer-events-none" />
+      <div className="ambient-orange-spotlight top-1/3 left-10 opacity-30 pointer-events-none" />
+      <div className="ambient-orange-spotlight bottom-10 right-10 opacity-20 pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#121215] border border-[#232328] text-xs font-semibold text-[#E8602E] mb-3">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-pill text-xs font-semibold text-[#E8602E] mb-4">
               <FontAwesomeIcon icon={faStar} className="text-xs" />
               <span>Success Stories Hub</span>
             </div>
@@ -92,7 +93,7 @@ export default function StoriesSection() {
           {STORIES.map((story) => (
             <div
               key={story.id}
-              className="p-7 sm:p-9 rounded-3xl bg-[#0D0D10] border border-[#232328] hover:border-[#E8602E]/60 shadow-[0_15px_40px_rgba(0,0,0,0.8)] transition-all duration-300 flex flex-col justify-between"
+              className="p-8 sm:p-10 rounded-[2.5rem] glass-card-interactive flex flex-col justify-between"
             >
               <div>
                 {/* Author Info */}
@@ -116,10 +117,10 @@ export default function StoriesSection() {
                   <button
                     type="button"
                     onClick={() => handleLike(story.id)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer backdrop-blur-md ${
                       liked[story.id]
-                        ? 'bg-[#E8602E]/20 text-[#E8602E] border-[#E8602E]'
-                        : 'bg-[#141418] text-[#A1A1AA] border-[#282830] hover:text-white'
+                        ? 'bg-[#E8602E]/25 text-[#E8602E] border-[#E8602E]'
+                        : 'bg-white/[0.05] text-[#A1A1AA] border-white/15 hover:text-white'
                     }`}
                   >
                     <FontAwesomeIcon
@@ -131,10 +132,10 @@ export default function StoriesSection() {
                 </div>
 
                 {/* Timeline Accordion Steps */}
-                <div className="space-y-4 relative pl-6 border-l-2 border-[#232328] my-6">
+                <div className="space-y-4 relative pl-6 border-l-2 border-white/10 my-6">
                   {/* Step 1: Education */}
                   <div className="relative">
-                    <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-[#16161A] border-2 border-[#E8602E] flex items-center justify-center" />
+                    <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-[#16161A] border-2 border-[#E8602E] flex items-center justify-center shadow-glow-orange-sm" />
                     <span className="text-[10px] uppercase font-bold tracking-wider text-[#A1A1AA] block">
                       1. Educational Path
                     </span>
@@ -145,7 +146,7 @@ export default function StoriesSection() {
 
                   {/* Step 2: Challenges */}
                   <div className="relative">
-                    <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-[#16161A] border-2 border-[#E8602E] flex items-center justify-center" />
+                    <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-[#16161A] border-2 border-[#E8602E] flex items-center justify-center shadow-glow-orange-sm" />
                     <span className="text-[10px] uppercase font-bold tracking-wider text-[#A1A1AA] block">
                       2. Major Hurdles & Challenges
                     </span>
@@ -156,7 +157,7 @@ export default function StoriesSection() {
 
                   {/* Step 3: Turning Point */}
                   <div className="relative">
-                    <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-[#16161A] border-2 border-[#E8602E] flex items-center justify-center" />
+                    <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-[#16161A] border-2 border-[#E8602E] flex items-center justify-center shadow-glow-orange-sm" />
                     <span className="text-[10px] uppercase font-bold tracking-wider text-[#E8602E] block">
                       3. The Strategic Turning Point
                     </span>
@@ -167,7 +168,7 @@ export default function StoriesSection() {
 
                   {/* Step 4: Outcome */}
                   <div className="relative">
-                    <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-[#E8602E] border-2 border-[#FFE8DE] flex items-center justify-center" />
+                    <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-[#E8602E] border-2 border-[#FFE8DE] flex items-center justify-center shadow-glow-orange-sm" />
                     <span className="text-[10px] uppercase font-bold tracking-wider text-[#10B981] block">
                       4. Current Career Outcome
                     </span>
@@ -178,7 +179,7 @@ export default function StoriesSection() {
                 </div>
 
                 {/* Key Advice Callout */}
-                <div className="p-4 rounded-2xl bg-[#121215] border border-[#232328] flex items-start gap-3 mt-4">
+                <div className="p-4 rounded-2xl bg-white/[0.04] backdrop-blur-md border border-white/10 flex items-start gap-3 mt-4">
                   <FontAwesomeIcon icon={faQuoteLeft} className="text-[#E8602E] text-base mt-0.5" />
                   <p className="text-xs italic text-[#D4D4D8] leading-relaxed">
                     "{story.quote}"

@@ -40,26 +40,92 @@
 }
 
 @layer components {
+  /* Ultra-Glassmorphism System ("Very Glass") */
+  .glass-panel-ultra {
+    background: rgba(18, 18, 24, 0.55);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 20px 40px -10px rgba(0, 0, 0, 0.7);
+  }
+
+  .glass-card-interactive {
+    background: rgba(14, 14, 18, 0.6);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12), 0 15px 35px -5px rgba(0, 0, 0, 0.8);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .glass-card-interactive:hover {
+    background: rgba(22, 22, 30, 0.75);
+    border-color: rgba(232, 96, 46, 0.55);
+    border-top-color: rgba(255, 255, 255, 0.35);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.25), 0 0 35px rgba(232, 96, 46, 0.25), 0 25px 50px -10px rgba(0, 0, 0, 0.9);
+    transform: translateY(-4px);
+  }
+
+  .glass-pill {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-input {
+    background: rgba(14, 14, 18, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .glass-input:focus {
+    border-color: #E8602E;
+    box-shadow: 0 0 15px rgba(232, 96, 46, 0.3), inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
   /* Premium Dark Glass Panel with Subtle Border */
   .sheryians-card {
-    @apply bg-[#121215]/80 backdrop-blur-xl border border-[#232328] hover:border-[#E8602E]/60 transition-all duration-300 rounded-2xl shadow-dark-card hover:shadow-glow-orange-sm;
+    background: rgba(18, 18, 24, 0.55);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 20px 40px -10px rgba(0, 0, 0, 0.7);
+    transition: all 0.3s ease;
   }
 
   .sheryians-panel {
-    @apply bg-[#0A0A0C]/90 backdrop-blur-2xl border border-[#232328] rounded-3xl shadow-glass;
+    background: rgba(10, 10, 14, 0.7);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 30px 60px rgba(0, 0, 0, 0.8);
   }
 
-  /*  High-Energy Buttons */
+  /* High-Energy Buttons */
   .btn-primary-orange {
-    @apply relative inline-flex items-center justify-center font-semibold text-white px-6 py-3 rounded-full bg-[#E8602E] hover:bg-[#BC4C22] active:scale-[0.98] shadow-glow-orange-sm hover:shadow-glow-orange transition-all duration-200;
+    @apply relative inline-flex items-center justify-center font-semibold text-white px-6 py-3 rounded-full bg-[#E8602E] hover:bg-[#BC4C22] active:scale-[0.98] shadow-glow-orange-sm hover:shadow-glow-orange transition-all duration-200 border-t border-white/25;
   }
 
   .btn-secondary-dark {
-    @apply relative inline-flex items-center justify-center font-semibold text-white px-6 py-3 rounded-full bg-[#16161A] hover:bg-[#202026] border border-[#2B2B33] hover:border-[#E8602E]/50 active:scale-[0.98] transition-all duration-200;
+    background: rgba(22, 22, 28, 0.65);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    @apply relative inline-flex items-center justify-center font-semibold text-white px-6 py-3 rounded-full hover:border-[#E8602E]/60 active:scale-[0.98] transition-all duration-200;
   }
 
   .btn-ghost-orange {
-    @apply relative inline-flex items-center justify-center font-medium text-[#E8602E] hover:text-white hover:bg-[#E8602E]/10 px-4 py-2 rounded-xl transition-all duration-200;
+    @apply relative inline-flex items-center justify-center font-medium text-[#E8602E] hover:text-white hover:bg-[#E8602E]/15 px-4 py-2 rounded-xl transition-all duration-200;
   }
 
   /* Input fields */

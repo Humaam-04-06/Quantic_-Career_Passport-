@@ -121,7 +121,7 @@ export default function MultimediaSection() {
 
       {/* Section Header */}
       <div className="relative z-10 text-center max-w-3xl mx-auto px-4 mb-16">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#121215] border border-[#232328] text-xs font-semibold text-[#E8602E] mb-4 shadow-sm">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-pill text-xs font-semibold text-[#E8602E] mb-4 shadow-sm">
           <FontAwesomeIcon icon={faPlay} className="text-xs" />
           <span>Interactive Masterclass Conduit</span>
         </div>
@@ -155,11 +155,11 @@ export default function MultimediaSection() {
               key={item.id}
               className={`my-8 transition-transform duration-300 ${item.offsetClass}`}
             >
-              {/* Full-Size Masterclass Card with Glass Border */}
-              <div className="w-[320px] sm:w-[380px] rounded-3xl bg-[#0D0D10]/95 backdrop-blur-xl border border-[#232328] hover:border-[#E8602E]/70 shadow-[0_20px_50px_rgba(0,0,0,0.9)] overflow-hidden transition-all duration-300 flex flex-col justify-between group">
+              {/* Full-Size Masterclass Card with Ultra-Glass Sheen */}
+              <div className="w-[320px] sm:w-[380px] rounded-[2rem] glass-card-interactive overflow-hidden flex flex-col justify-between group">
                 
                 {/* Top Video / Audio Thumbnail */}
-                <div className="relative h-48 w-full overflow-hidden bg-[#16161A]">
+                <div className="relative h-48 w-full overflow-hidden bg-black/40 border-b border-white/10">
                   <img
                     src={item.thumbnail}
                     alt={item.title}
@@ -167,20 +167,20 @@ export default function MultimediaSection() {
                       e.target.src =
                         'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80';
                     }}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-80"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-85"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D10] via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0E0E12]/90 via-transparent to-transparent" />
 
                   {/* Media Type & Duration Chip */}
                   <div className="absolute top-3 left-3 flex items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-wider border border-white/10 flex items-center gap-1.5">
+                    <span className="px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-wider border border-white/15 flex items-center gap-1.5">
                       <FontAwesomeIcon
                         icon={item.type === 'video' ? faVideo : faHeadphones}
                         className="text-[#E8602E]"
                       />
                       <span>{item.type}</span>
                     </span>
-                    <span className="px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md text-[10px] font-mono text-[#D4D4D8] border border-white/10">
+                    <span className="px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md text-[10px] font-mono text-[#D4D4D8] border border-white/15">
                       <FontAwesomeIcon icon={faClock} className="mr-1 text-[9px]" />
                       {item.duration}
                     </span>
@@ -189,10 +189,10 @@ export default function MultimediaSection() {
                   {/* Center Play Button Overlay */}
                   <Link
                     to={`/multimedia/${item.id}`}
-                    className="absolute inset-0 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity"
+                    className="absolute inset-0 flex items-center justify-center opacity-85 group-hover:opacity-100 transition-opacity"
                     aria-label="Play Media"
                   >
-                    <div className="w-12 h-12 rounded-full bg-[#E8602E] text-white flex items-center justify-center shadow-glow-orange-sm group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 rounded-full btn-primary-orange text-white flex items-center justify-center shadow-glow-orange-sm group-hover:scale-110 transition-transform">
                       <FontAwesomeIcon icon={faPlay} className="text-sm ml-0.5" />
                     </div>
                   </Link>
@@ -206,7 +206,7 @@ export default function MultimediaSection() {
                       <div className="flex items-center gap-1 text-[#FFB800] font-bold text-xs">
                         <FontAwesomeIcon icon={faStar} className="text-[11px]" />
                         <span>{item.rating}</span>
-                        <span className="text-[#71717A] text-[10px]">({item.reviewsCount})</span>
+                        <span className="text-[#A1A1AA] text-[10px]">({item.reviewsCount})</span>
                       </div>
                     </div>
 
@@ -230,7 +230,7 @@ export default function MultimediaSection() {
                           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                           className="overflow-hidden"
                         >
-                          <div className="p-3.5 rounded-2xl bg-[#141418] border border-[#232328] text-xs text-[#D4D4D8] leading-relaxed mb-4">
+                          <div className="p-3.5 rounded-2xl bg-white/[0.04] backdrop-blur-md border border-white/10 text-xs text-[#D4D4D8] leading-relaxed mb-4">
                             <span className="text-[10px] uppercase font-bold text-[#E8602E] block mb-1">
                               Transcript Excerpt:
                             </span>
@@ -242,16 +242,16 @@ export default function MultimediaSection() {
                   </div>
 
                   {/* Card Actions */}
-                  <div className="flex items-center gap-2 pt-3 border-t border-[#232328]">
+                  <div className="flex items-center gap-2 pt-3 border-t border-white/10">
                     <button
                       type="button"
                       onClick={() =>
                         setActiveTranscriptId(activeTranscriptId === item.id ? null : item.id)
                       }
-                      className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                      className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all flex items-center justify-center gap-1.5 cursor-pointer backdrop-blur-md ${
                         activeTranscriptId === item.id
-                          ? 'bg-[#E8602E]/20 text-[#E8602E] border-[#E8602E]'
-                          : 'bg-[#16161A] hover:bg-[#202026] text-[#D4D4D8] border-[#26262E]'
+                          ? 'bg-[#E8602E]/25 text-[#E8602E] border-[#E8602E]'
+                          : 'bg-white/[0.05] hover:bg-white/[0.1] text-[#D4D4D8] border-white/15'
                       }`}
                     >
                       <FontAwesomeIcon icon={faFileLines} className="text-xs" />
@@ -260,7 +260,7 @@ export default function MultimediaSection() {
 
                     <Link
                       to={`/multimedia/${item.id}`}
-                      className="px-4 py-2 rounded-xl bg-[#E8602E] hover:bg-[#BC4C22] text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-glow-orange-sm"
+                      className="px-4 py-2 rounded-xl btn-primary-orange text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-glow-orange-sm"
                     >
                       <span>Watch</span>
                       <FontAwesomeIcon icon={faArrowRight} className="text-[10px]" />

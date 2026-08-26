@@ -25,7 +25,7 @@ export function PassportDetailItem({ icon, label, value }) {
 export function PassportBookmarkBtn({ isBookmarked, onToggle }) {
   return (
     <button
-      className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer bg-[#18181C] hover:bg-[#222228] text-white border border-[#2B2B33] hover:border-[#E8602E]/60 flex-shrink-0"
+      className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer bg-white/[0.06] hover:bg-[#E8602E]/20 text-white border border-white/15 hover:border-[#E8602E]/70 backdrop-blur-md shadow-sm flex-shrink-0"
       type="button"
       title={isBookmarked ? 'Remove from Saved' : 'Save Passport'}
       onClick={onToggle}
@@ -34,7 +34,7 @@ export function PassportBookmarkBtn({ isBookmarked, onToggle }) {
       <FontAwesomeIcon
         icon={isBookmarked ? faBookmark : faBookmarkRegular}
         className={`text-sm transition-transform active:scale-125 ${
-          isBookmarked ? 'text-[#E8602E]' : 'text-[#A1A1AA]'
+          isBookmarked ? 'text-[#E8602E]' : 'text-white/80'
         }`}
       />
     </button>
@@ -57,9 +57,9 @@ export default function CareerPassportCard({
   const [isBookmarked, setIsBookmarked] = useState(false);
 
   return (
-    <div className="relative rounded-[2rem] overflow-hidden transition-all duration-300 w-full sm:w-[19.5rem] lg:w-[21.5rem] border border-[#232328] hover:border-[#E8602E]/60 shadow-[0_15px_35px_rgba(0,0,0,0.8)] hover:shadow-glow-orange-sm hover:-translate-y-2 group bg-[#0D0D10] flex flex-col justify-between h-[33rem] p-3">
+    <div className="relative rounded-[2rem] overflow-hidden transition-all duration-300 w-full sm:w-[19.5rem] lg:w-[21.5rem] glass-card-interactive group flex flex-col justify-between h-[33rem] p-3.5">
       {/* Top Image Container */}
-      <div className="relative h-48 w-full rounded-2xl overflow-hidden bg-[#16161A]">
+      <div className="relative h-48 w-full rounded-2xl overflow-hidden bg-black/40 border border-white/10">
         <img
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 brightness-90"
           src={imageUrl}
@@ -67,12 +67,12 @@ export default function CareerPassportCard({
           loading="lazy"
         />
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        {/* Glass Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0E0E12]/90 via-transparent to-transparent" />
 
         {/* Stage Badge on Image */}
         <div className="absolute top-3 left-3 z-10">
-          <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#000000]/80 backdrop-blur-md text-[#E8602E] border border-[#E8602E]/40 shadow-sm">
+          <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-black/70 backdrop-blur-xl text-[#E8602E] border border-white/15 shadow-sm">
             {stageBadge}
           </span>
         </div>
@@ -86,7 +86,7 @@ export default function CareerPassportCard({
             <span className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider truncate mr-2">
               {roleCategory}
             </span>
-            <span className="text-[10px] font-mono text-[#E8602E] bg-[#E8602E]/10 px-2 py-0.5 rounded border border-[#E8602E]/20 flex-shrink-0">
+            <span className="text-[10px] font-mono text-[#E8602E] bg-[#E8602E]/10 backdrop-blur-md px-2 py-0.5 rounded border border-[#E8602E]/30 flex-shrink-0">
               {passportCode}
             </span>
           </div>
@@ -111,7 +111,7 @@ export default function CareerPassportCard({
 
         <div>
           {/* Details Row (Salary / Metrics) */}
-          <div className="p-2.5 rounded-xl bg-[#121215] border border-[#202026] flex items-center justify-between mb-3">
+          <div className="p-2.5 rounded-xl bg-white/[0.04] backdrop-blur-md border border-white/10 flex items-center justify-between mb-3">
             <PassportDetailItem
               icon={faDollarSign}
               label="Potential:"
@@ -127,7 +127,7 @@ export default function CareerPassportCard({
           {/* Action Button & Bookmark Button */}
           <div className="flex items-center gap-2.5 pt-1">
             <button
-              className="flex-1 bg-[#E8602E] hover:bg-[#BC4C22] text-white py-2.5 px-4 rounded-xl text-xs font-bold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-glow-orange-sm flex items-center justify-center gap-2 cursor-pointer"
+              className="flex-1 btn-primary-orange py-2.5 px-4 rounded-xl text-xs font-bold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-glow-orange-sm flex items-center justify-center gap-2 cursor-pointer"
               type="button"
               onClick={() => navigate(ctaLink)}
             >
