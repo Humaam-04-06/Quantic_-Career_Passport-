@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --strokeDashoffset: 0;
+  --tabletVerticaloffset: 0px;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -117,5 +122,89 @@
     width: 20px;
     height: 20px;
     pointer-events: none;
+  }
+
+  /* 13_GSAP_Scroll_Trigger 3D Tablet Background */
+  .world3d-container {
+    position: absolute;
+    top: var(--tabletVerticaloffset, 0px);
+    z-index: 0;
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
+    shape-rendering: crispEdges;
+    overflow: visible;
+    width: 90vw;
+    max-width: 1200px;
+    padding-top: 5vw;
+    pointer-events: none;
+  }
+
+  .tablet-surface {
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    transform-origin: 0% 50%;
+    transform: rotateY(20deg);
+    -webkit-transform: rotateY(20deg);
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 150vh;
+    padding: 40px;
+    padding-left: 140px;
+    background: linear-gradient(109.61deg, rgba(232, 96, 46, 0.06) 4.26%, rgba(18, 18, 21, 0.5) 84.84%);
+    border: 1px solid rgba(232, 96, 46, 0.15);
+    border-radius: 30px;
+    opacity: 0.35;
+  }
+
+  .tablet-surface::before {
+    position: absolute;
+    left: 120px;
+    top: 20px;
+    right: 20px;
+    bottom: 20px;
+    content: "";
+    display: block;
+    background-color: #08080A;
+    border: 1px solid rgba(86, 90, 100, 0.25);
+    border-radius: 20px;
+  }
+
+  /* SVG Curving Glowing Trails */
+  .svg-paths-container {
+    position: absolute;
+    top: 75px;
+    z-index: 5;
+    width: 740px;
+    max-width: 100%;
+    overflow-x: clip;
+    height: 2000px;
+    filter: blur(1px);
+    pointer-events: none;
+  }
+
+  .svg-paths-container use {
+    fill: none;
+    stroke: url(#cl1);
+    stroke-linecap: round;
+    stroke-dashoffset: var(--strokeDashoffset, 0);
+    transition: stroke-dashoffset 0.05s linear;
+  }
+
+  .svg-paths-container use[href="#linePath01"] {
+    stroke-width: 20px;
+    stroke-dasharray: 20px 50px 120px 50px 20px 50px 300px 50px 20px 50px 150px 50px 20px 20000px;
+  }
+  .svg-paths-container use[href="#linePath02"] {
+    stroke-width: 34px;
+    stroke-dasharray: 34px 60px 120px 60px 34px 60px 300px 60px 34px 60px 150px 60px 34px 20000px;
+  }
+  .svg-paths-container use[href="#linePath03"] {
+    stroke-width: 25px;
+    stroke-dasharray: 25px 40px 120px 40px 25px 40px 250px 40px 25px 40px 150px 40px 25px 20000px;
+  }
+  .svg-paths-container use[href="#linePath04"] {
+    stroke-width: 40px;
+    stroke-dasharray: 40px 70px 100px 70px 40px 70px 200px 70px 40px 20000px;
   }
 }
