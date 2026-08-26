@@ -124,6 +124,8 @@ export default function NotchNavbar() {
   const handleLogout = () => {
     localStorage.removeItem('pathseeker_user');
     localStorage.removeItem('user');
+    sessionStorage.removeItem('pathseeker_active_chat_session');
+    localStorage.removeItem('pathseeker_chat_history');
     setCurrentUser(null);
     window.dispatchEvent(new Event('authChange'));
     toast.success('Signed out of Career Passport.');

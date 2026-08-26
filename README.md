@@ -90,7 +90,13 @@ pie title PathSeeker Platform Complete Ecosystem (100% Built & Verified)
 - [x] **Content & Resource CMS:** Upload and manage masterclasses, blueprints, and quiz questions.
 - [x] **User RBAC & Sole Admin Safeguard:** Block/unblock accounts, assign roles, and enforce the Sole Admin Protection Rule.
 
-### 1.9 Application Sitemap (SRS §1.9 Deliverable)
+### 1.9 AI Assistant (Google Gemini 3.6 Flash & 3.5 Flash)
+- [x] **Latest Gemini Model Engine:** Powered directly by `gemini-3.6-flash` and `gemini-3.5-flash` with zero-downtime knowledge fallback.
+- [x] **Role-Aware Telemetry Intelligence:** Super Administrators can query live MongoDB Atlas stats in natural language (e.g. *"How many candidates are in Machine Learning?"*).
+- [x] **Zero Credential Leaks:** Safe candidate responses with step-by-step guidance and clickable page links.
+- [x] **Smart History Lifecycle:** Chat history persists across page refreshes for logged-in users, while automatically resetting upon logout, guest page refresh, or account switching.
+
+### 1.10 Application Sitemap (SRS §1.9 Deliverable)
 - [x] **Interactive Sitemap:** Integrated directly on the Home Page (`/`) and accessible via footer navigation.
 
 ---

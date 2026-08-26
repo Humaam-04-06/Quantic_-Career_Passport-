@@ -347,4 +347,18 @@ export const adminApi = {
   },
 };
 
+// ========================================================
+// AI CHATBOT APIS (Powered by Google Gemini)
+// ========================================================
+export const chatApi = {
+  sendMessage: async (messages, user = null) => {
+    const res = await api.post('/chat', { messages, user });
+    return res.data;
+  },
+  getStatus: async () => {
+    const res = await api.get('/chat/status');
+    return res.data;
+  },
+};
+
 export default api;

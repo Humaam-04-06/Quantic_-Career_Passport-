@@ -15,6 +15,7 @@ import DashboardPage from './pages/DashboardPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
+import AiCareerChatbot from './components/chat/AiCareerChatbot.jsx';
 
 export default function App() {
   return (
@@ -68,6 +69,9 @@ export default function App() {
             {/* Fallback */}
             <Route path="*" element={<LandingPage />} />
           </Routes>
+
+          {/* Global AI Career Copilot & Platform Navigation Chatbot */}
+          <AiCareerChatbot />
         </div>
       </AuthProvider>
     </Router>

@@ -116,6 +116,8 @@ export function AuthProvider({ children }) {
   const logout = () => {
     localStorage.removeItem('pathseeker_user');
     localStorage.removeItem('user');
+    sessionStorage.removeItem('pathseeker_active_chat_session');
+    localStorage.removeItem('pathseeker_chat_history');
     setUser(null);
     window.dispatchEvent(new Event('authChange'));
     toast.success('Signed out of Career Passport.');

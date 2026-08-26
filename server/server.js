@@ -19,6 +19,7 @@ import resourceRoutes from './routes/resourceRoutes.js';
 import feedbackRoutes from './routes/feedbackRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import aiChatRoutes from './routes/aiChatRoutes.js';
 
 // Connect to Database
 connectDB();
@@ -56,6 +57,7 @@ app.use('/api/v1/resources', resourceRoutes);
 app.use('/api/v1/feedback', feedbackRoutes);
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/chat', aiChatRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
