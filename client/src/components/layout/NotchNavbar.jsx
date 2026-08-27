@@ -251,7 +251,7 @@ export default function NotchNavbar() {
 
               <Link
                 to="/register"
-                className="group flex items-center gap-1.5 btn-primary-orange px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-md flex-shrink-0"
+                className="hidden sm:flex group items-center gap-1.5 btn-primary-orange px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-md flex-shrink-0"
               >
                 <FontAwesomeIcon icon={faRocket} className="w-3.5 h-3.5 mb-0.5" />
                 <span>Get Started</span>
@@ -259,10 +259,10 @@ export default function NotchNavbar() {
             </div>
           )}
 
-          {/* Mobile / Tablet (1004px and below) Menu Button */}
+          {/* Mobile / Tablet Menu Button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="xl:hidden p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
+            className="xl:hidden p-2 rounded-xl bg-white/[0.06] hover:bg-white/15 text-slate-200 hover:text-white border border-white/10 cursor-pointer transition-all flex items-center justify-center"
             aria-label="Toggle Navigation Menu"
           >
             <FontAwesomeIcon icon={mobileOpen ? faXmark : faBars} className="w-4 h-4" />
@@ -271,7 +271,7 @@ export default function NotchNavbar() {
 
         {/* Mobile / Tablet Dropdown Drawer */}
         {mobileOpen && (
-          <div className="absolute top-full left-0 right-0 mt-2 glass-panel-ultra p-4 rounded-3xl shadow-2xl flex flex-col gap-2 xl:hidden animate-fadeIn">
+          <div className="absolute top-full left-0 right-0 mt-2 glass-panel-ultra p-4 rounded-3xl shadow-2xl flex flex-col gap-2 xl:hidden animate-fadeIn border border-white/15">
             {navLinks.map((link) => (
               <button
                 key={link.name}
@@ -280,7 +280,7 @@ export default function NotchNavbar() {
                   setMobileOpen(false);
                   navigate(link.path);
                 }}
-                className={`text-left px-4 py-2 rounded-2xl text-sm font-medium transition-colors ${
+                className={`text-left px-4 py-2.5 rounded-2xl text-sm font-medium transition-colors ${
                   activeTab === link.name
                     ? 'bg-[#E8602E]/25 text-[#E8602E] font-bold border border-[#E8602E]/40'
                     : 'text-slate-300 hover:bg-white/10'
@@ -290,7 +290,7 @@ export default function NotchNavbar() {
               </button>
             ))}
 
-            <div className="pt-2 border-t border-white/10 flex items-center gap-2">
+            <div className="pt-3 border-t border-white/10 flex items-center gap-2">
               {currentUser ? (
                 <button
                   type="button"
@@ -298,25 +298,27 @@ export default function NotchNavbar() {
                     setMobileOpen(false);
                     handleLogout();
                   }}
-                  className="w-full text-center py-2 rounded-xl bg-red-500/20 text-red-400 text-xs font-bold hover:bg-red-500/30 transition-colors"
+                  className="w-full text-center py-2.5 rounded-xl bg-red-500/20 text-red-400 text-xs font-bold hover:bg-red-500/30 transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  Sign Out ({currentUser.name})
+                  <FontAwesomeIcon icon={faArrowRightFromBracket} />
+                  <span>Sign Out ({currentUser.name || 'Account'})</span>
                 </button>
               ) : (
                 <>
                   <Link
                     to="/login"
                     onClick={() => setMobileOpen(false)}
-                    className="flex-1 text-center py-2 rounded-xl bg-white/10 text-white text-xs font-semibold hover:bg-white/15 transition-colors"
+                    className="flex-1 text-center py-2.5 rounded-xl bg-white/10 text-white text-xs font-semibold hover:bg-white/15 transition-colors border border-white/10"
                   >
-                    Login
+                    Sign In
                   </Link>
                   <Link
                     to="/register"
                     onClick={() => setMobileOpen(false)}
-                    className="flex-1 text-center py-2 rounded-xl btn-primary-orange text-xs font-bold"
+                    className="flex-1 text-center py-2.5 rounded-xl btn-primary-orange text-xs font-bold shadow-glow-orange-sm flex items-center justify-center gap-1.5"
                   >
-                    Sign Up
+                    <FontAwesomeIcon icon={faRocket} className="w-3.5 h-3.5" />
+                    <span>Get Started</span>
                   </Link>
                 </>
               )}
