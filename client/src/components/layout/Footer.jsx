@@ -114,14 +114,14 @@ export default function Footer() {
               <li>
                 <Link to="/careers?stage=professional" className="hover:text-[#E8602E] transition-colors">Professional Pivot</Link>
               </li>
-              <li>
+              {/* <li>
                 <Link to="/login" className="hover:text-[#E8602E] transition-colors">Admin Portal</Link>
-              </li>
+              </li> */}
             </ul>
           </div>
 
-          {/* Col 5: TechWiz & Legal */}
           <div>
+          {/* Col 5: TechWiz & Legal 
             <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-4">
               Competition Info
             </h4>
@@ -130,18 +130,22 @@ export default function Footer() {
               <p className="text-[11px]">Category: Full-Stack Web Application</p>
               <p className="text-[11px] text-[#E8602E]">Theme: Career Passport</p>
             </div>
+            */}
+            <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-4">
+              Social Links
+            </h4>
 
             <div className="flex items-center gap-3 mt-4 text-[#A1A1AA]">
-              <a href="#" className="w-8 h-8 rounded-xl bg-white/[0.05] border border-white/10 hover:border-[#E8602E] hover:text-[#E8602E] flex items-center justify-center transition-all backdrop-blur-sm">
+              <a href="https://github.com" target='_blank' className="w-8 h-8 rounded-xl bg-white/[0.05] border border-white/10 hover:border-[#E8602E] hover:text-[#E8602E] flex items-center justify-center transition-all backdrop-blur-sm">
                 <FontAwesomeIcon icon={faGithub} className="text-xs" />
               </a>
-              <a href="#" className="w-8 h-8 rounded-xl bg-white/[0.05] border border-white/10 hover:border-[#E8602E] hover:text-[#E8602E] flex items-center justify-center transition-all backdrop-blur-sm">
+              <a href="https://linkedin.com" target='_blank' className="w-8 h-8 rounded-xl bg-white/[0.05] border border-white/10 hover:border-[#E8602E] hover:text-[#E8602E] flex items-center justify-center transition-all backdrop-blur-sm">
                 <FontAwesomeIcon icon={faLinkedin} className="text-xs" />
               </a>
-              <a href="#" className="w-8 h-8 rounded-xl bg-white/[0.05] border border-white/10 hover:border-[#E8602E] hover:text-[#E8602E] flex items-center justify-center transition-all backdrop-blur-sm">
+              <a href="https://twitter.com" target='_blank' className="w-8 h-8 rounded-xl bg-white/[0.05] border border-white/10 hover:border-[#E8602E] hover:text-[#E8602E] flex items-center justify-center transition-all backdrop-blur-sm">
                 <FontAwesomeIcon icon={faTwitter} className="text-xs" />
               </a>
-              <a href="#" className="w-8 h-8 rounded-xl bg-white/[0.05] border border-white/10 hover:border-[#E8602E] hover:text-[#E8602E] flex items-center justify-center transition-all backdrop-blur-sm">
+              <a href="https://discord.com" target='_blank' className="w-8 h-8 rounded-xl bg-white/[0.05] border border-white/10 hover:border-[#E8602E] hover:text-[#E8602E] flex items-center justify-center transition-all backdrop-blur-sm">
                 <FontAwesomeIcon icon={faDiscord} className="text-xs" />
               </a>
             </div>
