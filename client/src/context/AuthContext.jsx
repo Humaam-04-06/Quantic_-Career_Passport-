@@ -6,6 +6,18 @@ import toast from 'react-hot-toast';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
+  const getStoredMaintenanceMode = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('pathseeker_platform_settings') || 'null');
+      if (saved && typeof saved.maintenanceMode === 'boolean') {
+        return saved.maintenanceMode;
+      }
+      return localStorage.getItem('pathseeker_maintenance_mode') === 'true';
+    } catch {
+      return false;
+    }
+  };
+
   const [user, setUser] = useState(() => {
     try {
       return JSON.parse(
@@ -17,6 +29,7 @@ export function AuthProvider({ children }) {
       return null;
     }
   });
+  const [isMaintenance, setIsMaintenance] = useState(getStoredMaintenanceMode);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -31,15 +44,37 @@ export function AuthProvider({ children }) {
       } catch {
         setUser(null);
       }
+      setIsMaintenance(getStoredMaintenanceMode());
     };
 
     window.addEventListener('storage', handleAuthChange);
     window.addEventListener('authChange', handleAuthChange);
+    window.addEventListener('platformSettingsChange', handleAuthChange);
+    window.addEventListener('userUpdate', handleAuthChange);
+
     return () => {
       window.removeEventListener('storage', handleAuthChange);
       window.removeEventListener('authChange', handleAuthChange);
+      window.removeEventListener('platformSettingsChange', handleAuthChange);
+      window.removeEventListener('userUpdate', handleAuthChange);
     };
   }, []);
+
+  const setMaintenanceMode = (enabled) => {
+    try {
+      const current = JSON.parse(localStorage.getItem('pathseeker_platform_settings') || '{}');
+      const updated = { ...current, maintenanceMode: enabled };
+      localStorage.setItem('pathseeker_platform_settings', JSON.stringify(updated));
+      localStorage.setItem('pathseeker_maintenance_mode', String(enabled));
+      setIsMaintenance(enabled);
+      window.dispatchEvent(new Event('platformSettingsChange'));
+      window.dispatchEvent(new Event('storage'));
+    } catch {
+      // ignore
+    }
+  };
+
+  const isAdmin = !!(user && (user.role === 'admin' || user.isAdmin === true));
 
   const login = async (email, password) => {
     setIsLoading(true);
@@ -128,6 +163,9 @@ export function AuthProvider({ children }) {
       value={{
         user,
         isAuthenticated: !!user,
+        isAdmin,
+        isMaintenance,
+        setMaintenanceMode,
         isLoading,
         login,
         register,

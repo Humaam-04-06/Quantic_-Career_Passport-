@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faWrench,
@@ -7,112 +7,42 @@ import {
   faTriangleExclamation,
   faArrowsRotate,
   faShieldHalved,
-  faLock,
   faUserShield,
   faCheck,
   faEnvelope,
   faKey,
 } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
-import { authApi } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 
 export default function MaintenanceModal() {
+  const { user, isAdmin, isMaintenance, setMaintenanceMode, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Helper to read current user
-  const getCurrentUser = () => {
-    try {
-      return JSON.parse(localStorage.getItem('pathseeker_user') || 'null');
-    } catch {
-      return null;
-    }
-  };
-
-  // Helper to check maintenance mode status
-  const getMaintenanceMode = () => {
-    try {
-      const saved = JSON.parse(localStorage.getItem('pathseeker_platform_settings') || 'null');
-      if (saved && typeof saved.maintenanceMode === 'boolean') {
-        return saved.maintenanceMode;
-      }
-      return localStorage.getItem('pathseeker_maintenance_mode') === 'true';
-    } catch {
-      return false;
-    }
-  };
-
-  const [isMaintenance, setIsMaintenance] = useState(getMaintenanceMode);
-  const [currentUser, setCurrentUser] = useState(getCurrentUser);
   const [isChecking, setIsChecking] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  // Synchronize state across tabs and local events
-  useEffect(() => {
-    const handleSync = () => {
-      setIsMaintenance(getMaintenanceMode());
-      setCurrentUser(getCurrentUser());
-    };
-
-    window.addEventListener('storage', handleSync);
-    window.addEventListener('platformSettingsChange', handleSync);
-    window.addEventListener('authChange', handleSync);
-    window.addEventListener('userUpdate', handleSync);
-
-    return () => {
-      window.removeEventListener('storage', handleSync);
-      window.removeEventListener('platformSettingsChange', handleSync);
-      window.removeEventListener('authChange', handleSync);
-      window.removeEventListener('userUpdate', handleSync);
-    };
-  }, []);
-
-  const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.isAdmin === true);
-
-  // Lock body scroll when maintenance mode is active for non-admin users
-  useEffect(() => {
-    if (isMaintenance && !isAdmin && location.pathname !== '/login') {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isMaintenance, isAdmin, location.pathname]);
-
   // Turn off maintenance mode (Admin action)
   const handleDisableMaintenance = () => {
-    try {
-      const currentSettings = JSON.parse(localStorage.getItem('pathseeker_platform_settings') || '{}');
-      const updated = { ...currentSettings, maintenanceMode: false };
-      localStorage.setItem('pathseeker_platform_settings', JSON.stringify(updated));
-      localStorage.setItem('pathseeker_maintenance_mode', 'false');
-      window.dispatchEvent(new Event('platformSettingsChange'));
-      window.dispatchEvent(new Event('storage'));
-      setIsMaintenance(false);
-      toast.success('Maintenance mode disabled. Public access restored!');
-    } catch {
-      toast.error('Failed to update maintenance settings.');
-    }
+    setMaintenanceMode(false);
+    toast.success('Maintenance mode disabled. Public access restored!');
   };
 
   // Re-check status
   const handleRecheckStatus = () => {
     setIsChecking(true);
     setTimeout(() => {
-      const active = getMaintenanceMode();
-      setIsMaintenance(active);
       setIsChecking(false);
-      if (!active) {
+      if (!isMaintenance) {
         toast.success('System maintenance completed! Platform is online.');
       } else {
         toast.error('System is still undergoing scheduled maintenance.');
       }
-    }, 600);
+    }, 500);
   };
 
   // Direct Admin Login from Maintenance screen
@@ -125,36 +55,15 @@ export default function MaintenanceModal() {
 
     setIsLoggingIn(true);
     try {
-      const res = await authApi.login({ email: adminEmail.trim(), password: adminPassword });
+      const res = await login(adminEmail.trim(), adminPassword);
       if (res?.user && (res.user.role === 'admin' || res.user.isAdmin)) {
-        localStorage.setItem('pathseeker_user', JSON.stringify(res.user));
-        localStorage.setItem('user', JSON.stringify(res.user));
-        setCurrentUser(res.user);
-        window.dispatchEvent(new Event('authChange'));
         toast.success(`Welcome Super Admin, ${res.user.name || 'Admin'}!`);
         setShowAdminLogin(false);
       } else {
         toast.error('Access Denied: Account does not have Super Administrator clearance.');
       }
-    } catch (err) {
-      // Fallback local admin check if offline
-      if (adminEmail === 'admin@pathseeker.com' && adminPassword === 'Admin@123') {
-        const adminUser = {
-          name: 'Super Admin',
-          email: 'admin@pathseeker.com',
-          role: 'admin',
-          isAdmin: true,
-          token: 'jwt_admin_token',
-        };
-        localStorage.setItem('pathseeker_user', JSON.stringify(adminUser));
-        localStorage.setItem('user', JSON.stringify(adminUser));
-        setCurrentUser(adminUser);
-        window.dispatchEvent(new Event('authChange'));
-        toast.success('Authenticated as Super Administrator.');
-        setShowAdminLogin(false);
-      } else {
-        toast.error(err?.response?.data?.message || 'Invalid administrator credentials.');
-      }
+    } catch {
+      toast.error('Invalid administrator credentials.');
     } finally {
       setIsLoggingIn(false);
     }
