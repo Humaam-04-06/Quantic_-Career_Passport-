@@ -1,11 +1,20 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import os from 'os';
 
-// Ensure uploads directory exists
-const uploadDir = path.join(process.cwd(), 'uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+// Safe upload directory for serverless (Vercel uses /tmp) and local dev
+const isServerless = !!process.env.VERCEL || process.env.NODE_ENV === 'production';
+const uploadDir = isServerless 
+  ? path.join(os.tmpdir(), 'uploads')
+  : path.join(process.cwd(), 'uploads');
+
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (e) {
+  console.warn('Upload dir note:', e.message);
 }
 
 const storage = multer.diskStorage({
@@ -21,7 +30,6 @@ const storage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
   const allowedExtensions = /pdf|doc|docx|png|jpg|jpeg/;
   const extname = allowedExtensions.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedExtensions.test(file.mimetype);
 
   if (extname) {
     return cb(null, true);
