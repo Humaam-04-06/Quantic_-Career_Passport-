@@ -124,6 +124,9 @@ export default function NotchNavbar() {
   const handleLogout = () => {
     localStorage.removeItem('pathseeker_user');
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('pathseeker_token');
+    localStorage.removeItem('pathseeker_admin_clearance');
     sessionStorage.removeItem('pathseeker_active_chat_session');
     localStorage.removeItem('pathseeker_chat_history');
     setCurrentUser(null);
