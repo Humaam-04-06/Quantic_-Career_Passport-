@@ -166,11 +166,11 @@ export default function NotchNavbar() {
           </span>
         </Link>
 
-        {/* 2. DESKTOP NAVIGATION LINKS (No Overview, Dashboard only when logged in) */}
+        {/* 2. DESKTOP NAVIGATION LINKS (Active on XL screens 1280px+) */}
         <nav
           ref={containerRef}
           onMouseLeave={handleMouseLeave}
-          className="hidden md:flex items-center gap-1 relative py-1"
+          className="hidden xl:flex items-center gap-1 relative py-1"
         >
           {/* Active / Hover Background Glass Pill */}
           <div
@@ -244,7 +244,7 @@ export default function NotchNavbar() {
             <div className="flex items-center gap-2">
               <Link
                 to="/login"
-                className="hidden sm:inline-block text-xs font-semibold text-slate-300 hover:text-white px-2 py-1 transition-colors"
+                className="hidden xl:inline-block text-xs font-semibold text-slate-300 hover:text-white px-2 py-1 transition-colors"
               >
                 Sign In
               </Link>
@@ -259,19 +259,19 @@ export default function NotchNavbar() {
             </div>
           )}
 
-          {/* Mobile Menu Button */}
+          {/* Mobile / Tablet (1004px and below) Menu Button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 cursor-pointer"
+            className="xl:hidden p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
             aria-label="Toggle Navigation Menu"
           >
             <FontAwesomeIcon icon={mobileOpen ? faXmark : faBars} className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Mobile Dropdown Drawer */}
+        {/* Mobile / Tablet Dropdown Drawer */}
         {mobileOpen && (
-          <div className="absolute top-full left-0 right-0 mt-2 glass-panel-ultra p-4 rounded-3xl shadow-2xl flex flex-col gap-2 md:hidden">
+          <div className="absolute top-full left-0 right-0 mt-2 glass-panel-ultra p-4 rounded-3xl shadow-2xl flex flex-col gap-2 xl:hidden animate-fadeIn">
             {navLinks.map((link) => (
               <button
                 key={link.name}
