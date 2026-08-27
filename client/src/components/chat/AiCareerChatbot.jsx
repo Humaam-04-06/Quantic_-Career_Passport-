@@ -87,9 +87,24 @@ export default function AiCareerChatbot() {
     return createDefaultWelcomeMessage();
   });
 
-  // Synchronize authentication changes (Login, Logout, Account Switch)
+  const getMaintenanceMode = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('pathseeker_platform_settings') || 'null');
+      if (saved && typeof saved.maintenanceMode === 'boolean') {
+        return saved.maintenanceMode;
+      }
+      return localStorage.getItem('pathseeker_maintenance_mode') === 'true';
+    } catch {
+      return false;
+    }
+  };
+
+  const [isMaintenance, setIsMaintenance] = useState(getMaintenanceMode);
+
+  // Synchronize authentication and maintenance changes
   useEffect(() => {
     const handleAuth = () => {
+      setIsMaintenance(getMaintenanceMode());
       const newUser = getCurrentUser();
       const newEmail = newUser ? (newUser.email || 'user') : null;
       const prevEmail = prevUserEmailRef.current;
@@ -122,16 +137,23 @@ export default function AiCareerChatbot() {
     window.addEventListener('authChange', handleAuth);
     window.addEventListener('userUpdate', handleAuth);
     window.addEventListener('profileChange', handleAuth);
+    window.addEventListener('platformSettingsChange', handleAuth);
 
     return () => {
       window.removeEventListener('storage', handleAuth);
       window.removeEventListener('authChange', handleAuth);
       window.removeEventListener('userUpdate', handleAuth);
       window.removeEventListener('profileChange', handleAuth);
+      window.removeEventListener('platformSettingsChange', handleAuth);
     };
   }, []);
 
   const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.isAdmin === true);
+
+  // If maintenance mode is active and user is not admin, hide chatbot
+  if (isMaintenance && !isAdmin) {
+    return null;
+  }
 
   // Save messages:
   // - If user is LOGGED IN: save to sessionStorage so it persists across refreshes in the active session

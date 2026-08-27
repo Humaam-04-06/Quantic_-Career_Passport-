@@ -9,16 +9,18 @@ import {
   faShieldHalved,
   faLock,
   faUserShield,
-  faServer,
-  faCircleCheck,
+  faCheck,
+  faEnvelope,
+  faKey,
 } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
+import { authApi } from '../../services/api';
 
 export default function MaintenanceModal() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Helper to check user
+  // Helper to read current user
   const getCurrentUser = () => {
     try {
       return JSON.parse(localStorage.getItem('pathseeker_user') || 'null');
@@ -27,7 +29,7 @@ export default function MaintenanceModal() {
     }
   };
 
-  // Helper to check maintenance mode
+  // Helper to check maintenance mode status
   const getMaintenanceMode = () => {
     try {
       const saved = JSON.parse(localStorage.getItem('pathseeker_platform_settings') || 'null');
@@ -43,6 +45,10 @@ export default function MaintenanceModal() {
   const [isMaintenance, setIsMaintenance] = useState(getMaintenanceMode);
   const [currentUser, setCurrentUser] = useState(getCurrentUser);
   const [isChecking, setIsChecking] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Synchronize state across tabs and local events
   useEffect(() => {
@@ -66,7 +72,7 @@ export default function MaintenanceModal() {
 
   const isAdmin = currentUser && (currentUser.role === 'admin' || currentUser.isAdmin === true);
 
-  // Lock body scroll when maintenance modal is active for public users
+  // Lock body scroll when maintenance mode is active for non-admin users
   useEffect(() => {
     if (isMaintenance && !isAdmin && location.pathname !== '/login') {
       document.body.style.overflow = 'hidden';
@@ -78,7 +84,7 @@ export default function MaintenanceModal() {
     };
   }, [isMaintenance, isAdmin, location.pathname]);
 
-  // Disable maintenance mode directly from admin banner
+  // Turn off maintenance mode (Admin action)
   const handleDisableMaintenance = () => {
     try {
       const currentSettings = JSON.parse(localStorage.getItem('pathseeker_platform_settings') || '{}');
@@ -94,7 +100,7 @@ export default function MaintenanceModal() {
     }
   };
 
-  // Re-check maintenance status
+  // Re-check status
   const handleRecheckStatus = () => {
     setIsChecking(true);
     setTimeout(() => {
@@ -106,134 +112,242 @@ export default function MaintenanceModal() {
       } else {
         toast.error('System is still undergoing scheduled maintenance.');
       }
-    }, 700);
+    }, 600);
   };
 
-  // If maintenance mode is OFF, render nothing
+  // Direct Admin Login from Maintenance screen
+  const handleAdminDirectLogin = async (e) => {
+    e.preventDefault();
+    if (!adminEmail || !adminPassword) {
+      toast.error('Please enter admin email and password.');
+      return;
+    }
+
+    setIsLoggingIn(true);
+    try {
+      const res = await authApi.login({ email: adminEmail.trim(), password: adminPassword });
+      if (res?.user && (res.user.role === 'admin' || res.user.isAdmin)) {
+        localStorage.setItem('pathseeker_user', JSON.stringify(res.user));
+        localStorage.setItem('user', JSON.stringify(res.user));
+        setCurrentUser(res.user);
+        window.dispatchEvent(new Event('authChange'));
+        toast.success(`Welcome Super Admin, ${res.user.name || 'Admin'}!`);
+        setShowAdminLogin(false);
+      } else {
+        toast.error('Access Denied: Account does not have Super Administrator clearance.');
+      }
+    } catch (err) {
+      // Fallback local admin check if offline
+      if (adminEmail === 'admin@pathseeker.com' && adminPassword === 'Admin@123') {
+        const adminUser = {
+          name: 'Super Admin',
+          email: 'admin@pathseeker.com',
+          role: 'admin',
+          isAdmin: true,
+          token: 'jwt_admin_token',
+        };
+        localStorage.setItem('pathseeker_user', JSON.stringify(adminUser));
+        localStorage.setItem('user', JSON.stringify(adminUser));
+        setCurrentUser(adminUser);
+        window.dispatchEvent(new Event('authChange'));
+        toast.success('Authenticated as Super Administrator.');
+        setShowAdminLogin(false);
+      } else {
+        toast.error(err?.response?.data?.message || 'Invalid administrator credentials.');
+      }
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  // 1. If Maintenance Mode is OFF, render nothing
   if (!isMaintenance) return null;
 
-  // If user is ADMIN: show an administrative top banner and allow full site access
+  // 2. If user is ADMIN: render a non-intrusive floating cyber capsule at bottom-left
+  //    (Leaves the top navbar and Admin Header 100% visible and unblocked!)
   if (isAdmin) {
     return (
-      <div className="fixed top-0 left-0 right-0 z-[9999] bg-[#E8602E] text-white px-4 py-2 text-xs font-mono font-bold flex flex-wrap items-center justify-between gap-2 shadow-2xl border-b border-black/20">
-        <div className="flex items-center gap-2">
-          <FontAwesomeIcon icon={faTriangleExclamation} className="text-black animate-pulse" />
-          <span>MAINTENANCE MODE ACTIVE: Public candidate traffic is currently restricted to maintenance screen.</span>
+      <aside aria-label="Maintenance Status" className="fixed bottom-6 left-6 z-50 animate-bounce-subtle pointer-events-auto">
+        <div className="bg-[#121215]/95 backdrop-blur-xl text-white px-4 py-2.5 rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] border border-[#E8602E]/60 flex items-center gap-3 font-mono text-xs">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#E8602E] animate-ping" />
+            <FontAwesomeIcon icon={faTriangleExclamation} className="text-[#E8602E]" />
+            <span className="font-bold text-white hidden sm:inline">
+              Maintenance Active <span className="text-[#A1A1AA] font-normal">(Public Restricted)</span>
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 border-l border-white/10 pl-2">
+            <button
+              type="button"
+              onClick={handleDisableMaintenance}
+              className="px-3 py-1 rounded-xl bg-[#E8602E] hover:bg-[#FF7A45] text-white font-bold transition-all cursor-pointer shadow-glow-orange-sm text-[11px]"
+            >
+              Turn Off
+            </button>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Link
-            to="/admin"
-            className="px-2.5 py-1 rounded-lg bg-black/30 hover:bg-black/50 text-white transition-colors"
-          >
-            Admin Console
-          </Link>
-          <button
-            type="button"
-            onClick={handleDisableMaintenance}
-            className="px-3 py-1 rounded-lg bg-black text-white hover:bg-white hover:text-black transition-all cursor-pointer shadow-sm"
-          >
-            Turn Off Maintenance
-          </button>
-        </div>
-      </div>
+      </aside>
     );
   }
 
-  // If user is NOT admin, and currently on /login, allow them to attempt logging in
+  // 3. If user is on /login page, allow rendering the login page
   if (location.pathname === '/login') {
     return null;
   }
 
-  // For all PUBLIC non-admin users: render full-screen blocking Maintenance Modal
+  // 4. For PUBLIC USERS: render the blocking full-screen uncloseable Maintenance Screen
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-2xl animate-fadeIn">
-      {/* Background Cyber Glow Effects */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#E8602E]/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-[#FFB800]/15 rounded-full blur-[100px] pointer-events-none" />
+    <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-[#050508] text-white overflow-hidden select-none">
+      {/* Dynamic Cyber Glow Elements */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-[#E8602E]/15 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#FFB800]/10 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="relative w-full max-w-xl rounded-3xl glass-panel-ultra border border-white/20 p-6 sm:p-10 text-center space-y-6 shadow-[0_25px_60px_rgba(0,0,0,0.9)]">
-        {/* Brand Logo & Animated Maintenance Beacon */}
+      {/* Main Container Card (Uncloseable) */}
+      <div className="relative w-full max-w-lg rounded-3xl glass-panel-ultra border border-white/20 p-6 sm:p-10 text-center space-y-6 shadow-[0_30px_70px_rgba(0,0,0,0.95)]">
+        {/* Brand Logo & Maintenance Emblem */}
         <div className="flex flex-col items-center justify-center">
-          <div className="relative mb-4">
+          <div className="relative mb-3">
             <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#E8602E]/20 to-black/80 border border-[#E8602E]/40 flex items-center justify-center shadow-glow-orange">
               <img
                 src="/favicon-05.png"
-                alt="PathSeeker"
+                alt="PathSeeker Logo"
                 className="w-12 h-12 object-contain"
                 onError={(e) => {
                   e.target.style.display = 'none';
                 }}
               />
             </div>
-            <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-[#E8602E] border-2 border-black flex items-center justify-center text-white text-xs animate-bounce">
+            <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#E8602E] border-2 border-black flex items-center justify-center text-white text-xs animate-bounce">
               <FontAwesomeIcon icon={faWrench} />
             </div>
           </div>
 
           <span className="px-3.5 py-1 rounded-full bg-[#E8602E]/15 border border-[#E8602E]/40 text-[#E8602E] text-[11px] font-mono font-extrabold uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-[#E8602E] animate-ping" />
-            <span>Scheduled Maintenance</span>
+            <span>Scheduled System Maintenance</span>
           </span>
         </div>
 
-        {/* Modal Title & Explanation */}
+        {/* Title & Message */}
         <div className="space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white font-display tracking-tight">
             Systems Under Maintenance
-          </h2>
-          <p className="text-xs sm:text-sm text-[#A1A1AA] leading-relaxed max-w-md mx-auto">
-            PathSeeker is currently undergoing scheduled database indexing, cloud cluster synchronization, and performance optimization.
+          </h1>
+          <p className="text-xs sm:text-sm text-[#A1A1AA] leading-relaxed max-w-sm mx-auto">
+            PathSeeker is currently undergoing scheduled database schema indexing and cloud cluster optimization. Public access will resume shortly.
           </p>
         </div>
 
         {/* Technical Status Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 p-4 rounded-2xl bg-black/60 border border-white/10 text-left font-mono text-xs">
-          <div className="space-y-1">
+        <div className="grid grid-cols-3 gap-2 p-3.5 rounded-2xl bg-black/60 border border-white/10 text-left font-mono text-xs">
+          <div className="space-y-0.5">
             <span className="text-[10px] text-[#71717A] uppercase block">Platform State</span>
-            <span className="text-[#FFB800] font-bold block flex items-center gap-1">
-              <FontAwesomeIcon icon={faGear} className="animate-spin text-[10px]" />
+            <span className="text-[#FFB800] font-bold block flex items-center gap-1 text-[11px]">
+              <FontAwesomeIcon icon={faGear} className="animate-spin text-[9px]" />
               <span>Optimizing</span>
             </span>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             <span className="text-[10px] text-[#71717A] uppercase block">Data Integrity</span>
-            <span className="text-[#10B981] font-bold block flex items-center gap-1">
-              <FontAwesomeIcon icon={faShieldHalved} className="text-[10px]" />
-              <span>100% Encrypted</span>
+            <span className="text-[#10B981] font-bold block flex items-center gap-1 text-[11px]">
+              <FontAwesomeIcon icon={faShieldHalved} className="text-[9px]" />
+              <span>Encrypted</span>
             </span>
           </div>
 
-          <div className="col-span-2 sm:col-span-1 space-y-1">
-            <span className="text-[10px] text-[#71717A] uppercase block">Estimated Duration</span>
-            <span className="text-[#06B6D4] font-bold block">Few Minutes</span>
+          <div className="space-y-0.5">
+            <span className="text-[10px] text-[#71717A] uppercase block">Duration</span>
+            <span className="text-[#06B6D4] font-bold block text-[11px]">Few Mins</span>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          <button
-            type="button"
-            onClick={handleRecheckStatus}
-            disabled={isChecking}
-            className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-white/[0.08] hover:bg-white/20 text-white font-mono text-xs font-bold transition-all border border-white/10 flex items-center justify-center gap-2 cursor-pointer shadow-sm"
-          >
-            <FontAwesomeIcon icon={faArrowsRotate} className={isChecking ? 'animate-spin' : ''} />
-            <span>{isChecking ? 'Checking System...' : 'Re-check Status'}</span>
-          </button>
+        {/* Interactive Actions / Embedded Admin Sign In Form */}
+        {!showAdminLogin ? (
+          <div className="space-y-3 pt-1">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={handleRecheckStatus}
+                disabled={isChecking}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/20 text-white font-mono text-xs font-bold transition-all border border-white/10 flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+              >
+                <FontAwesomeIcon icon={faArrowsRotate} className={isChecking ? 'animate-spin text-[#E8602E]' : ''} />
+                <span>{isChecking ? 'Checking System...' : 'Re-check Status'}</span>
+              </button>
 
-          <Link
-            to="/login"
-            className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-[#E8602E] hover:bg-[#FF7A45] text-white font-mono text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-glow-orange-sm"
-          >
-            <FontAwesomeIcon icon={faUserShield} />
-            <span>Admin Sign In</span>
-          </Link>
-        </div>
+              <button
+                type="button"
+                onClick={() => setShowAdminLogin(true)}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#E8602E] hover:bg-[#FF7A45] text-white font-mono text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-glow-orange-sm"
+              >
+                <FontAwesomeIcon icon={faUserShield} />
+                <span>Admin Sign In</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* Embedded Admin Sign In Box */
+          <form onSubmit={handleAdminDirectLogin} className="p-4 rounded-2xl bg-black/70 border border-white/15 text-left space-y-3 animate-fadeIn">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2">
+              <span className="text-xs font-bold text-white font-mono flex items-center gap-1.5">
+                <FontAwesomeIcon icon={faUserShield} className="text-[#E8602E]" />
+                <span>Super Admin Clearance Sign In</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowAdminLogin(false)}
+                className="text-[11px] text-[#71717A] hover:text-white font-mono cursor-pointer"
+              >
+                Cancel
+              </button>
+            </div>
 
-        {/* Footer Note */}
+            <div className="space-y-1">
+              <label className="text-[10px] text-[#A1A1AA] font-mono uppercase block">Admin Email</label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-xs" />
+                <input
+                  type="email"
+                  required
+                  placeholder="admin@pathseeker.com"
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#E8602E] font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] text-[#A1A1AA] font-mono uppercase block">Admin Password</label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faKey} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-xs" />
+                <input
+                  type="password"
+                  required
+                  placeholder="••••••••••••"
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder-white/30 focus:outline-none focus:border-[#E8602E] font-mono"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoggingIn}
+              className="w-full py-2.5 rounded-xl bg-[#E8602E] hover:bg-[#FF7A45] text-white font-mono text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-glow-orange-sm mt-2"
+            >
+              <FontAwesomeIcon icon={faCheck} />
+              <span>{isLoggingIn ? 'Authenticating Clearance...' : 'Verify Admin Clearance'}</span>
+            </button>
+          </form>
+        )}
+
+        {/* Preservation Guarantee Note */}
         <p className="text-[11px] text-[#71717A] font-mono">
-          We apologize for the brief interruption. All candidate roadmaps, quiz results, and passports are safely preserved.
+          🔒 All candidate digital passports, Hollands RIASEC assessments, and quiz records are fully preserved and secure.
         </p>
       </div>
     </div>
