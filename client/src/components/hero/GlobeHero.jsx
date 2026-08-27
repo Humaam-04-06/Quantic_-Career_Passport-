@@ -213,7 +213,7 @@ export default function GlobeHero() {
         */}
 
         {/* Animated Fluid Water Inside Text */}
-        <div className="w-full max-w-4xl mb-4">
+        <div className="w-full max-w-4xl mb-4 flex items-center justify-center mx-auto text-center">
           <HeroFluidText line1="Discover What" line2="Fits You Best" />
         </div>
 

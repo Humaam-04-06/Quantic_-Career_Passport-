@@ -191,25 +191,19 @@ export default function HeroFluidText({
     maskCtx.textAlign = 'center';
     maskCtx.textBaseline = 'middle';
 
+    // Consistent centered 2-line title layout with responsive scaling across all screen sizes
+    let fontSize;
     if (isMobile) {
-      // 2 lines stacked on mobile
-      const fontSize = Math.min(W * 0.12, H * 0.38);
-      maskCtx.font = `900 ${fontSize}px "Outfit", "Inter", "Arial Black", sans-serif`;
-      maskCtx.fillText(line1.toUpperCase(), W / 2, H * 0.32);
-      maskCtx.fillText(line2.toUpperCase(), W / 2, H * 0.72);
+      fontSize = Math.min(W * 0.11, H * 0.36);
     } else if (isTablet) {
-      // 2 lines on tablet
-      const fontSize = Math.min(W * 0.09, H * 0.42);
-      maskCtx.font = `900 ${fontSize}px "Outfit", "Inter", "Arial Black", sans-serif`;
-      maskCtx.fillText(line1.toUpperCase(), W / 2, H * 0.32);
-      maskCtx.fillText(line2.toUpperCase(), W / 2, H * 0.72);
+      fontSize = Math.min(W * 0.095, H * 0.40);
     } else {
-      // Single line or unified hero title on large desktop
-      const fullText = `${line1} ${line2}`.toUpperCase();
-      const fontSize = Math.min(W * 0.075, H * 0.65);
-      maskCtx.font = `900 ${fontSize}px "Outfit", "Inter", "Arial Black", sans-serif`;
-      maskCtx.fillText(fullText, W / 2, H / 2);
+      fontSize = Math.min(W * 0.085, H * 0.44);
     }
+
+    maskCtx.font = `900 ${fontSize}px "Outfit", "Inter", "Arial Black", sans-serif`;
+    maskCtx.fillText(line1.toUpperCase(), W / 2, H * 0.32);
+    maskCtx.fillText(line2.toUpperCase(), W / 2, H * 0.72);
 
     if (maskTexRef.current) {
       maskTexRef.current.image = maskCanvas;
@@ -234,6 +228,9 @@ export default function HeroFluidText({
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, RENDERER.MAX_PIXEL_RATIO));
     renderer.setSize(width, height);
     renderer.setClearColor(0x000000, 0); // Transparent canvas background
+    renderer.domElement.style.display = 'block';
+    renderer.domElement.style.margin = '0 auto';
+    renderer.domElement.style.maxWidth = '100%';
     container.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
