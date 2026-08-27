@@ -11,7 +11,7 @@ import {
   faSpinner,
   faPaperPlane,
 } from '@fortawesome/free-solid-svg-icons';
-import { authApi } from '../../services/api';
+import { authApi, API_BASE_URL } from '../../services/api';
 import toast from 'react-hot-toast';
 
 export default function ForgotPasswordModal({ isOpen, onClose, onSuccess, initialEmail = '' }) {
@@ -27,6 +27,13 @@ export default function ForgotPasswordModal({ isOpen, onClose, onSuccess, initia
     if (initialEmail) {
       setEmail(initialEmail);
     }
+    if (!isOpen) {
+      setStep(1);
+      setOtp('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setPreviewOtp('');
+    }
   }, [initialEmail, isOpen]);
 
   if (!isOpen) return null;
@@ -41,7 +48,7 @@ export default function ForgotPasswordModal({ isOpen, onClose, onSuccess, initia
     setIsLoading(true);
     try {
       // Call backend API /api/v1/auth/forgot-password
-      const res = await fetch('http://localhost:5000/api/v1/auth/forgot-password', {
+      const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim() }),
@@ -81,7 +88,7 @@ export default function ForgotPasswordModal({ isOpen, onClose, onSuccess, initia
 
     setIsLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/v1/auth/reset-password', {
+      const res = await fetch(`${API_BASE_URL}/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -13,6 +13,7 @@ import {
   faArrowUpRightFromSquare,
 } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
+import { API_BASE_URL } from '../../services/api.js';
 
 export default function VerificationModal({
   isOpen,
@@ -57,7 +58,7 @@ export default function VerificationModal({
 
     setIsSending(true);
     try {
-      const res = await fetch('http://localhost:5000/api/v1/auth/send-verification-otp', {
+      const res = await fetch(`${API_BASE_URL}/auth/send-verification-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim() }),
@@ -86,7 +87,7 @@ export default function VerificationModal({
 
     setIsVerifying(true);
     try {
-      const res = await fetch('http://localhost:5000/api/v1/auth/verify-passport-otp', {
+      const res = await fetch(`${API_BASE_URL}/auth/verify-passport-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim(), otp: otp.trim() }),

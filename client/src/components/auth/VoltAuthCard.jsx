@@ -19,48 +19,95 @@ import toast from 'react-hot-toast';
 import ProfileSetupModal from './ProfileSetupModal.jsx';
 import ForgotPasswordModal from './ForgotPasswordModal.jsx';
 import { DEFAULT_AVATAR } from '../../data/avatarsData.js';
+import { API_BASE_URL } from '../../services/api.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 const DEMO_ACCOUNTS = {
-  'student@pathseeker.ai': {
-    name: 'Sarah Chen',
-    email: 'student@pathseeker.ai',
-    password: 'password123',
-    role: 'Student',
+  'student@pathseeker.com': {
+    name: 'Sarah Chen (Student)',
+    email: 'student@pathseeker.com',
+    password: 'Password@2026',
+    role: 'student',
     targetRole: 'AI Systems Engineer',
     targetCompany: 'Google DeepMind',
     avatar: DEFAULT_AVATAR,
     skills: ['Python', 'Machine Learning', 'Data Structures', 'PyTorch'],
     isVerified: true,
   },
-  'graduate@pathseeker.ai': {
-    name: 'Marcus Vance',
-    email: 'graduate@pathseeker.ai',
+  'student@pathseeker.ai': {
+    name: 'Sarah Chen',
+    email: 'student@pathseeker.ai',
     password: 'password123',
-    role: 'Graduate',
+    role: 'student',
+    targetRole: 'AI Systems Engineer',
+    targetCompany: 'Google DeepMind',
+    avatar: DEFAULT_AVATAR,
+    skills: ['Python', 'Machine Learning', 'Data Structures', 'PyTorch'],
+    isVerified: true,
+  },
+  'graduate@pathseeker.com': {
+    name: 'Sarah Chen (Graduate)',
+    email: 'graduate@pathseeker.com',
+    password: 'Graduate@12345',
+    role: 'graduate',
     targetRole: 'Cloud Solutions Architect',
     targetCompany: 'AWS / Microsoft',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
     skills: ['AWS / Cloud', 'Docker', 'Kubernetes', 'Go'],
     isVerified: true,
   },
-  'pro@pathseeker.ai': {
-    name: 'Elena Rostova',
-    email: 'pro@pathseeker.ai',
+  'graduate@pathseeker.ai': {
+    name: 'Marcus Vance',
+    email: 'graduate@pathseeker.ai',
     password: 'password123',
-    role: 'Professional',
+    role: 'graduate',
+    targetRole: 'Cloud Solutions Architect',
+    targetCompany: 'AWS / Microsoft',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    skills: ['AWS / Cloud', 'Docker', 'Kubernetes', 'Go'],
+    isVerified: true,
+  },
+  'pro@pathseeker.com': {
+    name: 'Marcus Vance (Professional)',
+    email: 'pro@pathseeker.com',
+    password: 'Pro@12345',
+    role: 'professional',
     targetRole: 'Principal Systems Architect',
     targetCompany: 'Anthropic',
     avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
     skills: ['Distributed Systems', 'Rust', 'System Design', 'Cybersecurity'],
     isVerified: true,
   },
+  'pro@pathseeker.ai': {
+    name: 'Elena Rostova',
+    email: 'pro@pathseeker.ai',
+    password: 'password123',
+    role: 'professional',
+    targetRole: 'Principal Systems Architect',
+    targetCompany: 'Anthropic',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
+    skills: ['Distributed Systems', 'Rust', 'System Design', 'Cybersecurity'],
+    isVerified: true,
+  },
+  'admin@pathseeker.com': {
+    name: 'System Administrator',
+    email: 'admin@pathseeker.com',
+    password: 'Admin@123',
+    role: 'admin',
+    isAdmin: true,
+    targetRole: 'Platform Administrator',
+    targetCompany: 'PathSeeker Core',
+    avatar: 'https://api.dicebear.com/7.x/lorelei/svg?seed=QuantumMage&backgroundColor=1e1b4b',
+    skills: ['Platform Governance', 'Audit', 'System Architecture'],
+    isVerified: true,
+  },
   'admin@pathseeker.ai': {
     name: 'Super Administrator',
     email: 'admin@pathseeker.ai',
-    password: 'Admin@12345',
+    password: 'Admin@123',
     role: 'admin',
+    isAdmin: true,
     targetRole: 'Platform Administrator',
     targetCompany: 'PathSeeker Core',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
@@ -316,7 +363,7 @@ export default function VoltAuthCard({ initialMode = 'login' }) {
     let authFailedReason = null;
 
     try {
-      const res = await fetch('http://localhost:5000/api/v1/auth/login', {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: userEmail, password: loginPassword }),
@@ -446,7 +493,7 @@ export default function VoltAuthCard({ initialMode = 'login' }) {
 
     // Trigger backend registration to store in MongoDB Atlas and dispatch real Welcome Email
     try {
-      await fetch('http://localhost:5000/api/v1/auth/register', {
+      await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

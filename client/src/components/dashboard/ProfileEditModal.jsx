@@ -18,6 +18,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 import ForgotPasswordModal from '../auth/ForgotPasswordModal.jsx';
+import { API_BASE_URL } from '../../services/api.js';
 import { AVATAR_PRESETS, DEFAULT_AVATAR } from '../../data/avatarsData.js';
 
 export default function ProfileEditModal({
@@ -146,7 +147,7 @@ export default function ProfileEditModal({
       window.dispatchEvent(new Event('profileChange'));
 
       // Persist permanently into MongoDB Atlas
-      fetch('http://localhost:5000/api/v1/auth/update-profile', {
+      fetch(`${API_BASE_URL}/auth/update-profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -180,7 +181,7 @@ export default function ProfileEditModal({
 
     try {
       const userEmail = (email || '').trim().toLowerCase();
-      const res = await fetch('http://localhost:5000/api/v1/auth/update-password', {
+      const res = await fetch(`${API_BASE_URL}/auth/update-password`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
