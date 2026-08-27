@@ -2,11 +2,21 @@
 > **AI-Driven Multi-Tier Career Exploration, RIASEC Aptitude Profiling, Dynamic Media Vault & Cryptographic Digital Passport Ecosystem.**  
 > *Engineered for TechWiz 6 — Global AI Web Application Competition*
 
+[![Live Website](https://img.shields.io/badge/Live%20Website-quantic--career--passport.vercel.app-brightgreen?style=for-the-badge&logo=vercel)](https://quantic-career-passport.vercel.app/)
+[![Live Backend API](https://img.shields.io/badge/Backend%20API-pathseeker--api.vercel.app-blue?style=for-the-badge&logo=node.js)](https://pathseeker-api.vercel.app/api/health)
 [![TechWiz 6](https://img.shields.io/badge/Competition-TechWiz%206-blue?style=for-the-badge&logo=codeforces)](https://www.aptech-worldwide.com)
 [![Project Status](https://img.shields.io/badge/SRS%20Compliance-100%25%20Verified-success?style=for-the-badge)](https://github.com)
 [![Database](https://img.shields.io/badge/Database-MongoDB%20Atlas%20Cloud-emerald?style=for-the-badge&logo=mongodb)](https://mongodb.com)
 [![SMTP](https://img.shields.io/badge/SMTP-Gmail%20Live%20Relay-red?style=for-the-badge&logo=gmail)](https://gmail.com)
-[![Frontend](https://img.shields.io/badge/Frontend-React%2018%20%2B%20Vite%20%2B%20Tailwind-blueviolet?style=for-the-badge&logo=react)](https://react.dev)
+
+---
+
+## 🌐 🚀 Live Production Deployment
+
+* 🖥️ **Live Web Application (Frontend):** **[https://quantic-career-passport.vercel.app](https://quantic-career-passport.vercel.app/)**
+* ⚡ **Live API Server (Backend):** **[https://pathseeker-api.vercel.app](https://pathseeker-api.vercel.app/api/health)**
+* 🗄️ **Cloud Database:** **MongoDB Atlas Live Cluster**
+* 🤖 **AI Engine:** **Google Gemini 3.6 Flash / 3.5 Flash**
 
 ---
 
@@ -105,8 +115,8 @@ pie title PathSeeker Platform Complete Ecosystem (100% Built & Verified)
 
 | Clearance Level | Email | Password | Role / Access Scope |
 | :--- | :--- | :--- | :--- |
-| **Super Administrator** | `admin@pathseeker.com` | `Admin@12345` | **Root Clearance:** Full access to `/admin` & `/dashboard` |
-| **Alternative Admin** | `admin@pathseeker.ai` | `Admin@12345` | **Super Admin:** Full platform governance authority |
+| **Super Administrator** | `admin@pathseeker.com` | `Admin@123` / `Admin@12345` | **Root Clearance:** Full access to `/admin` & `/dashboard` |
+| **Alternative Admin** | `admin@pathseeker.ai` | `Admin@123` / `Admin@12345` | **Super Admin:** Full platform governance authority |
 | **Demo Student** | `student@pathseeker.com` | `Password@2026` | **Student Track:** High School & Foundation Sprints |
 | **Demo Professional** | `pro@pathseeker.com` | `Password@2026` | **Professional Track:** Executive Mastery & Lateral Pivots |
 
@@ -123,7 +133,7 @@ pie title PathSeeker Platform Complete Ecosystem (100% Built & Verified)
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/YOUR_USERNAME/Quantic_Career_Passport.git
+git clone https://github.com/Humaam-04-06/Quantic_-Career_Passport-.git
 cd Quantic_(Career_Passport)
 
 # 2. Install backend dependencies
@@ -156,7 +166,9 @@ Visit **`http://localhost:5173`** in your web browser.
 - **Frontend:** React 18, Vite, Vanilla CSS + Tailwind CSS, Three.js, GSAP 3, SweetAlert2, FontAwesome 6
 - **Backend:** Node.js (ESM), Express.js, JWT, Bcrypt, Multer
 - **Database:** MongoDB Atlas Cloud (Mongoose ODM)
+- **AI Intelligence:** Google Gemini Generative AI SDK
 - **Mailing Engine:** Nodemailer with Gmail SMTP SSL Relay (`smtp.gmail.com:465`)
+- **Cloud Hosting:** Vercel Production Deployment
 
 ---
 
