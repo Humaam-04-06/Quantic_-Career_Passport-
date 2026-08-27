@@ -87,11 +87,11 @@ export default function AdminSettings() {
 
     if (nextState) {
       Swal.fire({
-        title: 'Enable Maintenance Mode?',
-        text: 'This will display a public maintenance status notice on user dashboards while allowing root admins to configure the system.',
+        title: 'Activate Maintenance Mode?',
+        text: 'This will lock public candidate traffic behind the scheduled maintenance screen across the entire website, while granting root administrators access.',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes, Enable Notice',
+        confirmButtonText: 'Yes, Lock Public Access',
         cancelButtonText: 'Cancel',
         background: '#121215',
         color: '#FFFFFF',
@@ -104,13 +104,23 @@ export default function AdminSettings() {
         },
       }).then((result) => {
         if (result.isConfirmed) {
-          setSettings((prev) => ({ ...prev, maintenanceMode: true }));
-          toast.success('Maintenance mode flag activated.');
+          const updated = { ...settings, maintenanceMode: true };
+          setSettings(updated);
+          localStorage.setItem('pathseeker_platform_settings', JSON.stringify(updated));
+          localStorage.setItem('pathseeker_maintenance_mode', 'true');
+          window.dispatchEvent(new Event('platformSettingsChange'));
+          window.dispatchEvent(new Event('storage'));
+          toast.success('Maintenance mode activated for public users.');
         }
       });
     } else {
-      setSettings((prev) => ({ ...prev, maintenanceMode: false }));
-      toast.success('Maintenance mode disabled. System operational.');
+      const updated = { ...settings, maintenanceMode: false };
+      setSettings(updated);
+      localStorage.setItem('pathseeker_platform_settings', JSON.stringify(updated));
+      localStorage.setItem('pathseeker_maintenance_mode', 'false');
+      window.dispatchEvent(new Event('platformSettingsChange'));
+      window.dispatchEvent(new Event('storage'));
+      toast.success('Maintenance mode disabled. Public access restored!');
     }
   };
 

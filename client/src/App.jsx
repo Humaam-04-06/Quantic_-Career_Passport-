@@ -16,6 +16,7 @@ import AdminPage from './pages/AdminPage.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 import AiCareerChatbot from './components/chat/AiCareerChatbot.jsx';
+import MaintenanceModal from './components/common/MaintenanceModal.jsx';
 
 export default function App() {
   return (
@@ -69,6 +70,9 @@ export default function App() {
             {/* Fallback */}
             <Route path="*" element={<LandingPage />} />
           </Routes>
+
+          {/* Full-Screen Scheduled Maintenance Modal for Public Users */}
+          <MaintenanceModal />
 
           {/* Global AI Career Copilot & Platform Navigation Chatbot */}
           <AiCareerChatbot />
