@@ -80,33 +80,47 @@ export function AuthProvider({ children }) {
     setIsLoading(true);
     try {
       const res = await authApi.login({ email, password });
+      const rawUser = res?.user || res?.data?.user || {};
+      const userRole = rawUser.role || (email.toLowerCase() === 'admin@pathseeker.com' || email.toLowerCase() === 'admin@pathseeker.ai' ? 'admin' : 'graduate');
+      const isUserAdmin = userRole === 'admin' || rawUser.isAdmin === true || email.toLowerCase() === 'admin@pathseeker.com' || email.toLowerCase() === 'admin@pathseeker.ai';
+
       const userData = {
-        id: res.data?.user?.id || res.data?.user?._id || 'cand-alex',
-        name: res.data?.user?.name || 'Alex Morgan',
-        email: res.data?.user?.email || email,
-        role: res.data?.user?.role || 'graduate',
-        avatar: res.data?.user?.avatar || DEFAULT_AVATAR,
-        token: res.token || 'jwt-token-' + Date.now(),
+        id: rawUser.id || rawUser._id || 'cand-alex',
+        name: rawUser.name || (isUserAdmin ? 'System Administrator' : 'Candidate'),
+        email: rawUser.email || email,
+        role: userRole,
+        isAdmin: isUserAdmin,
+        avatar: rawUser.avatar || DEFAULT_AVATAR,
+        token: res?.token || res?.data?.token || 'jwt-token-' + Date.now(),
       };
       localStorage.setItem('pathseeker_user', JSON.stringify(userData));
+      localStorage.setItem('user', JSON.stringify(userData));
       setUser(userData);
       window.dispatchEvent(new Event('authChange'));
       toast.success(`Welcome back, ${userData.name}!`);
       return { success: true, user: userData };
     } catch (err) {
-      // Fallback offline mock for development
-      const fallbackUser = {
-        name: email.split('@')[0],
-        email,
-        role: 'graduate',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-        token: 'mock-jwt-' + Date.now(),
-      };
-      localStorage.setItem('pathseeker_user', JSON.stringify(fallbackUser));
-      setUser(fallbackUser);
-      window.dispatchEvent(new Event('authChange'));
-      toast.success(`Welcome back, ${fallbackUser.name}!`);
-      return { success: true, user: fallbackUser };
+      // Local fallback for offline mode
+      const isOfflineAdmin = (email.toLowerCase() === 'admin@pathseeker.com' || email.toLowerCase() === 'admin@pathseeker.ai') && password === 'Admin@123';
+      if (isOfflineAdmin) {
+        const adminUser = {
+          id: 'admin-root',
+          name: 'System Administrator',
+          email,
+          role: 'admin',
+          isAdmin: true,
+          avatar: DEFAULT_AVATAR,
+          token: 'mock-jwt-' + Date.now(),
+        };
+        localStorage.setItem('pathseeker_user', JSON.stringify(adminUser));
+        localStorage.setItem('user', JSON.stringify(adminUser));
+        setUser(adminUser);
+        window.dispatchEvent(new Event('authChange'));
+        toast.success(`Welcome back, ${adminUser.name}!`);
+        return { success: true, user: adminUser };
+      }
+
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -116,15 +130,21 @@ export function AuthProvider({ children }) {
     setIsLoading(true);
     try {
       const res = await authApi.register({ name, email, password, role });
+      const rawUser = res?.user || res?.data?.user || {};
+      const userRole = rawUser.role || role || 'graduate';
+      const isUserAdmin = userRole === 'admin' || rawUser.isAdmin === true;
+
       const userData = {
-        id: res.data?.user?.id || res.data?.user?._id,
-        name: res.data?.user?.name || name,
-        email: res.data?.user?.email || email,
-        role: res.data?.user?.role || role || 'graduate',
-        avatar: res.data?.user?.avatar || DEFAULT_AVATAR,
-        token: res.token || 'jwt-token-' + Date.now(),
+        id: rawUser.id || rawUser._id || 'cand-' + Date.now(),
+        name: rawUser.name || name,
+        email: rawUser.email || email,
+        role: userRole,
+        isAdmin: isUserAdmin,
+        avatar: rawUser.avatar || DEFAULT_AVATAR,
+        token: res?.token || res?.data?.token || 'jwt-token-' + Date.now(),
       };
       localStorage.setItem('pathseeker_user', JSON.stringify(userData));
+      localStorage.setItem('user', JSON.stringify(userData));
       setUser(userData);
       window.dispatchEvent(new Event('authChange'));
       toast.success('Career Passport profile registered successfully!');
@@ -135,10 +155,12 @@ export function AuthProvider({ children }) {
         name,
         email,
         role: role || 'graduate',
+        isAdmin: role === 'admin',
         avatar: DEFAULT_AVATAR,
         token: 'mock-jwt-' + Date.now(),
       };
       localStorage.setItem('pathseeker_user', JSON.stringify(fallbackUser));
+      localStorage.setItem('user', JSON.stringify(fallbackUser));
       setUser(fallbackUser);
       window.dispatchEvent(new Event('authChange'));
       toast.success('Career Passport profile created!');
