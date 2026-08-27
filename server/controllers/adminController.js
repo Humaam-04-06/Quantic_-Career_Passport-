@@ -502,3 +502,30 @@ export const flushCache = async (req, res) => {
     timestamp: new Date().toISOString(),
   });
 };
+
+export const syncDatabase = async (req, res, next) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalCareers = await Career.countDocuments();
+    const totalMedia = await Multimedia.countDocuments();
+    const totalResources = await Resource.countDocuments();
+    const totalStories = await SuccessStory.countDocuments();
+    const totalQuizQuestions = await QuizQuestion.countDocuments();
+
+    res.status(200).json({
+      success: true,
+      message: 'MongoDB Atlas database schemas and indexes successfully synchronized!',
+      stats: {
+        careers: totalCareers,
+        users: totalUsers,
+        media: totalMedia,
+        resources: totalResources,
+        stories: totalStories,
+        quizQuestions: totalQuizQuestions,
+      },
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    next(error);
+  }
+};

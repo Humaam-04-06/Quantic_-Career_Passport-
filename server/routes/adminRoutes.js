@@ -28,6 +28,7 @@ import {
   toggleUserBlock,
   deleteUser,
   flushCache,
+  syncDatabase,
 } from '../controllers/adminController.js';
 
 const router = express.Router();
@@ -35,6 +36,7 @@ const router = express.Router();
 // 1. Overview stats & Telemetry
 router.get('/stats', getAdminStats);
 router.post('/system/flush-cache', flushCache);
+router.post('/system/sync-db', syncDatabase);
 
 // 2. Stories moderation
 router.get('/stories', getPendingStories);

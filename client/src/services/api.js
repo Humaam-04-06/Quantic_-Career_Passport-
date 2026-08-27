@@ -235,6 +235,10 @@ export const adminApi = {
     const res = await api.post('/admin/system/flush-cache');
     return res.data;
   },
+  syncDatabase: async () => {
+    const res = await api.post('/admin/system/sync-db');
+    return res.data;
+  },
   // Story moderation
   getStories: async () => {
     const res = await api.get('/admin/stories');
