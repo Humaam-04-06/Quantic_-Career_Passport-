@@ -21,10 +21,17 @@ import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import aiChatRoutes from './routes/aiChatRoutes.js';
 
-// Connect to Database
-connectDB();
-
 const app = express();
+
+// Database connection middleware for serverless & long-running instances
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+  } catch (err) {
+    console.warn('DB connect warning:', err.message);
+  }
+  next();
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
