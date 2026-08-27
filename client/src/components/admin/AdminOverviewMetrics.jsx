@@ -15,25 +15,27 @@ import toast from 'react-hot-toast';
 import { showConfirm, showSuccess } from '../../utils/sweetAlert';
 
 export default function AdminOverviewMetrics({ stats, onFlushCache }) {
-  const usersCount = stats?.users?.total || 1420;
-  const careersCount = stats?.careers?.total || 150;
-  const mediaCount = stats?.media?.total || 6;
-  const downloadsCount = stats?.resources?.totalDownloads || 78160;
+  const usersCount = stats?.users?.total !== undefined ? stats.users.total : 4;
+  const studentsCount = stats?.users?.students ?? 1;
+  const prosCount = stats?.users?.professionals ?? 1;
+  const careersCount = stats?.careers?.total !== undefined ? stats.careers.total : 6;
+  const mediaCount = stats?.media?.total !== undefined ? stats.media.total : 6;
+  const downloadsCount = stats?.resources?.totalDownloads !== undefined ? stats.resources.totalDownloads : 7;
 
   const kpis = [
     {
       id: 'candidates',
       label: 'Registered Candidates',
       value: usersCount.toLocaleString(),
-      badge: '+34% This Month',
-      trend: `${stats?.users?.students || 0} Students • ${stats?.users?.professionals || 0} Pros`,
+      badge: `${stats?.users?.total || 4} Total Accounts`,
+      trend: `${studentsCount} Students • ${prosCount} Pros`,
       icon: faUsers,
       color: 'text-[#E8602E] bg-[#E8602E]/20',
     },
     {
       id: 'careers',
       label: 'Career Pathways Indexed',
-      value: `${careersCount}+`,
+      value: `${careersCount} Roles`,
       badge: '100% Dynamic',
       trend: 'Across 6 Engineering Domains',
       icon: faPassport,
@@ -51,7 +53,7 @@ export default function AdminOverviewMetrics({ stats, onFlushCache }) {
     {
       id: 'downloads',
       label: 'Total Resource Downloads',
-      value: downloadsCount.toLocaleString(),
+      value: `${downloadsCount} Downloads`,
       badge: 'Verified Blueprints',
       trend: '4.94 / 5.0 Faculty Rating',
       icon: faBookOpen,
